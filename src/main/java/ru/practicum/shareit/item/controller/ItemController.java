@@ -23,26 +23,33 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity <ItemDto> create (@RequestBody ItemDto itemDto) {
-        ItemDto item = service.create(itemDto, null);
+    public ResponseEntity <ItemDto> create (@RequestHeader ("X-Sharer-User-Id") Long userId,
+                                            @RequestBody ItemDto itemDto) {
+        ItemDto item = service.create(itemDto, userId);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
     @PatchMapping("/{id}")
-    public ResponseEntity <ItemDto> update (@RequestBody ItemDto itemDto, @PathVariable Long id) {
-    return null;
+    public ResponseEntity <ItemDto> update (@RequestHeader ("X-Sharer-User-Id") Long userId,
+                                            @RequestBody ItemDto itemDto, @PathVariable Long id) {
+        ItemDto item = service.update(id, itemDto, userId);
+        return new ResponseEntity<>(item, HttpStatus.OK);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity <ItemDto> delete (@PathVariable Long id) {
-        return null;
+    public ResponseEntity <ItemDto> delete (@RequestHeader ("X-Sharer-User-Id") Long userId,
+                                            @PathVariable Long id) {
+        ItemDto item = service.delete(id, userId);
+        return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
    @GetMapping("/{id}")
     public ResponseEntity <ItemDto> getById (@PathVariable Long id) {
-        return null;
+       ItemDto item = service.getById(id);
+       return new ResponseEntity<>(item, HttpStatus.OK);
     }
     @GetMapping
-    public ResponseEntity <List<ItemDto>> getAll () {
-        return null;
+    public ResponseEntity <List<ItemDto>> getAll (@RequestHeader ("X-Sharer-User-Id") Long userId) {
+        List<ItemDto> items = service.getAll(userId);
+        return new ResponseEntity<>(items, HttpStatus.OK);
     }
 
    @GetMapping("/search")

@@ -66,8 +66,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public List<UserDto> getAll() {
-        return getAll().stream().filter(user -> user.getOwner()
-                .getId() == userId).map(ItemMapper::toItemDto).collect(Collectors.toList());
+        return STORAGE.values().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     private void validateUser (UserDto userDto) {
