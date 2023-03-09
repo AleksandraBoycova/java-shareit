@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
 
     private static Map<Long, Item> STORAGE = new HashMap<>();
-    private static long            COUNTER = 1;
-    private        UserService     userService;
+    private static long COUNTER = 1;
+    private UserService userService;
 
     @Autowired
     public ItemServiceImpl(UserService userService) {
@@ -55,8 +55,8 @@ public class ItemServiceImpl implements ItemService {
         if (!STORAGE.containsKey(itemId)) {
             throw new ItemNotFoundException("Item not found!");
         }
-        UserDto user         = userService.getById(userId);
-        Item    itemToUpdate = STORAGE.get(itemId);
+        UserDto user = userService.getById(userId);
+        Item itemToUpdate = STORAGE.get(itemId);
         if (itemToUpdate.getOwner().getId() != userId) {
             throw new UnauthorizedException("User can not update this item!");
         }
@@ -80,8 +80,8 @@ public class ItemServiceImpl implements ItemService {
         if (!STORAGE.containsKey(id)) {
             throw new ItemNotFoundException("Item not found!");
         }
-        UserDto user         = userService.getById(userId);
-        Item    itemToDelete = STORAGE.get(id);
+        UserDto user = userService.getById(userId);
+        Item itemToDelete = STORAGE.get(id);
         if (itemToDelete.getOwner().getId() != userId) {
             throw new UnauthorizedException("User can not delete this item!");
         }
@@ -104,6 +104,7 @@ public class ItemServiceImpl implements ItemService {
         return getAll().stream().filter(item -> item.getOwner()
                 .getId() == userId).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
+
     @Override
     public List<ItemDto> search(String text) {
         if (text == null || text.isBlank()) {

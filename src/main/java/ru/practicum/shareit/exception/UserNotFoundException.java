@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
-public class UserNotFoundException extends Exception implements ApiSubError{
+public class UserNotFoundException extends Exception implements ApiSubError {
     public UserNotFoundException(String message) {
         super(message);
     }

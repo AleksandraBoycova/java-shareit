@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties({"cause", "stackTrace", "suppressed", "localizedMessage"})
-public class ValidationException extends Exception implements ApiSubError{
+public class ValidationException extends Exception implements ApiSubError {
 
     private String object;
     private String field;

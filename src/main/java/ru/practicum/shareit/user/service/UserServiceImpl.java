@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
     private static Map<Long, User> STORAGE = new HashMap<>();
-    private static long            COUNTER = 1;
+    private static long COUNTER = 1;
 
 
     @Override

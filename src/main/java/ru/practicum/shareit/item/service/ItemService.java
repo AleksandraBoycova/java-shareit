@@ -18,5 +18,6 @@ public interface ItemService {
     ItemDto getById(Long id) throws ItemNotFoundException;
 
     List<ItemDto> getAll(Long userId);
+
     List<ItemDto> search(String text);
 }

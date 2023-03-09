@@ -8,7 +8,6 @@ import ru.practicum.shareit.exception.DuplicateValueException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
@@ -33,7 +32,7 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PatchMapping ("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody @Valid UserDto userDto) throws UserNotFoundException, ValidationException, DuplicateValueException {
         UserDto user = service.update(id, userDto);
         return new ResponseEntity<>(user, HttpStatus.OK);

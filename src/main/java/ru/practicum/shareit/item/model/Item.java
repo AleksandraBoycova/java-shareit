@@ -11,11 +11,11 @@ import ru.practicum.shareit.user.model.User;
 @Data
 
 public class Item {
-   private Long id;
-   private String name;
-   private String description;
-  private boolean available;
-   private User owner;
+    private Long id;
+    private String name;
+    private String description;
+    private boolean available;
+    private User owner;
 
     public Long getId() {
         return id;
