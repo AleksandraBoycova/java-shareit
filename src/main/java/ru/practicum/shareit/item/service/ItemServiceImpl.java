@@ -14,10 +14,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,7 +54,7 @@ public class ItemServiceImpl implements ItemService {
         }
         UserDto user = userService.getById(userId);
         Item itemToUpdate = STORAGE.get(itemId);
-        if (itemToUpdate.getOwner().getId() != userId) {
+        if (!Objects.equals(itemToUpdate.getOwner().getId(), userId)) {
             throw new UnauthorizedException("User can not update this item!");
         }
         if (itemDto.getName() != null) {
@@ -82,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
         }
         UserDto user = userService.getById(userId);
         Item itemToDelete = STORAGE.get(id);
-        if (itemToDelete.getOwner().getId() != userId) {
+        if (!Objects.equals(itemToDelete.getOwner().getId(), userId)) {
             throw new UnauthorizedException("User can not delete this item!");
         }
         STORAGE.remove(id);
@@ -101,8 +98,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAll(Long userId) {
-        return getAll().stream().filter(item -> item.getOwner()
-                .getId() == userId).map(ItemMapper::toItemDto).collect(Collectors.toList());
+        return getAll().stream().filter(item -> Objects.equals(item.getOwner()
+                .getId(), userId)).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
