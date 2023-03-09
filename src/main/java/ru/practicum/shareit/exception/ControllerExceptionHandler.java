@@ -48,8 +48,20 @@ public class ControllerExceptionHandler {
         MethodParameter parameter = e.getParameter();
         parameter.getAnnotatedElement();
         log.error("Method Argument Not Valid Exception");
-        return new ResponseEntity<>(applicationError, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(applicationError, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApplicationError> handleUnauthorizedException(UnauthorizedException e) {
+        ApplicationError applicationError = new ApplicationError(HttpStatus.FORBIDDEN, "Нет доступа", e);
+        log.error("Unauthorized exception thrown");
+        return new ResponseEntity<>(applicationError, HttpStatus.FORBIDDEN);
+    }
 
+    @ExceptionHandler(DuplicateValueException.class)
+    public ResponseEntity<ApplicationError> handleDuplicateValueException(DuplicateValueException e) {
+        ApplicationError applicationError = new ApplicationError(HttpStatus.CONFLICT, "Конфликт", e);
+        log.error("Duplicate Value exception thrown");
+        return new ResponseEntity<>(applicationError, HttpStatus.CONFLICT);
+    }
 }
