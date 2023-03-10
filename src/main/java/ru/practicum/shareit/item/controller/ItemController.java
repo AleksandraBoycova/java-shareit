@@ -34,27 +34,27 @@ public class ItemController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ItemDto> update(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                          @RequestBody ItemDto itemDto, @PathVariable Long id) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException {
+    public ResponseEntity<ItemDto> update(@RequestHeader("X-Sharer-User-Id") long userId,
+                                          @RequestBody ItemDto itemDto, @PathVariable long id) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException {
         ItemDto item = service.update(id, itemDto, userId);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ItemDto> delete(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                          @PathVariable Long id) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException {
+    public ResponseEntity<ItemDto> delete(@RequestHeader("X-Sharer-User-Id") long userId,
+                                          @PathVariable long id) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException {
         ItemDto item = service.delete(id, userId);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemDto> getById(@PathVariable Long id) throws ItemNotFoundException {
+    public ResponseEntity<ItemDto> getById(@PathVariable long id) throws ItemNotFoundException {
         ItemDto item = service.getById(id);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<List<ItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
         List<ItemDto> items = service.getAll(userId);
         return new ResponseEntity<>(items, HttpStatus.OK);
     }

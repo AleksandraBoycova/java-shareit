@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(Long userId, UserDto userDto) throws UserNotFoundException, DuplicateValueException {
+    public UserDto update(long userId, UserDto userDto) throws UserNotFoundException, DuplicateValueException {
         if (!STORAGE.containsKey(userId)) {
             throw new UserNotFoundException("User not found");
         }
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto delete(Long id) throws UserNotFoundException {
+    public UserDto delete(long id) throws UserNotFoundException {
         if (!STORAGE.containsKey(id)) {
             throw new UserNotFoundException("User not found");
         }
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getById(Long id) throws UserNotFoundException {
+    public UserDto getById(long id) throws UserNotFoundException {
         if (!STORAGE.containsKey(id)) {
             throw new UserNotFoundException("User not found");
         }

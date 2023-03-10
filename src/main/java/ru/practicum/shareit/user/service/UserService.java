@@ -10,11 +10,11 @@ import java.util.List;
 public interface UserService {
     UserDto create(UserDto userDto) throws ValidationException, DuplicateValueException;
 
-    UserDto update(Long userId, UserDto userDto) throws UserNotFoundException, ValidationException, DuplicateValueException;
+    UserDto update(long userId, UserDto userDto) throws UserNotFoundException, ValidationException, DuplicateValueException;
 
-    UserDto delete(Long id) throws UserNotFoundException;
+    UserDto delete(long id) throws UserNotFoundException;
 
-    UserDto getById(Long id) throws UserNotFoundException;
+    UserDto getById(long id) throws UserNotFoundException;
 
     List<UserDto> getAll();
 }

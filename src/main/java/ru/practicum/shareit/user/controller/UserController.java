@@ -33,19 +33,19 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody @Valid UserDto userDto) throws UserNotFoundException, ValidationException, DuplicateValueException {
+    public ResponseEntity<UserDto> update(@PathVariable long id, @RequestBody @Valid UserDto userDto) throws UserNotFoundException, ValidationException, DuplicateValueException {
         UserDto user = service.update(id, userDto);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserDto> delete(@PathVariable Long id) throws UserNotFoundException {
+    public ResponseEntity<UserDto> delete(@PathVariable long id) throws UserNotFoundException {
         UserDto user = service.delete(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getById(@PathVariable Long id) throws UserNotFoundException {
+    public ResponseEntity<UserDto> getById(@PathVariable long id) throws UserNotFoundException {
         UserDto user = service.getById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }

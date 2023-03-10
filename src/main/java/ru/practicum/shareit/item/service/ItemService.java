@@ -9,15 +9,15 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import java.util.List;
 
 public interface ItemService {
-    ItemDto create(ItemDto itemDto, Long userId) throws UserNotFoundException, ValidationException;
+    ItemDto create(ItemDto itemDto, long userId) throws UserNotFoundException, ValidationException;
 
-    ItemDto update(Long itemId, ItemDto itemDto, Long userId) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException;
+    ItemDto update(long itemId, ItemDto itemDto, long userId) throws UserNotFoundException, ItemNotFoundException, UnauthorizedException;
 
-    ItemDto delete(Long id, Long userId) throws ItemNotFoundException, ValidationException, UserNotFoundException, UnauthorizedException;
+    ItemDto delete(long id, long userId) throws ItemNotFoundException, UserNotFoundException, UnauthorizedException;
 
-    ItemDto getById(Long id) throws ItemNotFoundException;
+    ItemDto getById(long id) throws ItemNotFoundException;
 
-    List<ItemDto> getAll(Long userId);
+    List<ItemDto> getAll(long userId);
 
     List<ItemDto> search(String text);
 }

@@ -30,10 +30,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto create(ItemDto itemDto, Long userId) throws UserNotFoundException, ValidationException {
-        if (userId == null) {
-            throw new RuntimeException();
-        }
+    public ItemDto create(ItemDto itemDto, long userId) throws UserNotFoundException, ValidationException {
         User owner = UserMapper.toUser(userService.getById(userId));
         owner.setId(userId);
         validate(itemDto);
@@ -45,10 +42,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto update(Long itemId, ItemDto itemDto, Long userId) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException {
-        if (userId == null) {
-            throw new ValidationException("User id is null!");
-        }
+    public ItemDto update(long itemId, ItemDto itemDto, long userId) throws UserNotFoundException, ItemNotFoundException, UnauthorizedException {
         if (!STORAGE.containsKey(itemId)) {
             throw new ItemNotFoundException("Item not found!");
         }
@@ -70,10 +64,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto delete(Long id, Long userId) throws ItemNotFoundException, ValidationException, UserNotFoundException, UnauthorizedException {
-        if (userId == null) {
-            throw new ValidationException("User id is null");
-        }
+    public ItemDto delete(long id, long userId) throws ItemNotFoundException, UserNotFoundException, UnauthorizedException {
         if (!STORAGE.containsKey(id)) {
             throw new ItemNotFoundException("Item not found!");
         }
@@ -88,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getById(Long id) throws ItemNotFoundException {
+    public ItemDto getById(long id) throws ItemNotFoundException {
         if (!STORAGE.containsKey(id)) {
             throw new ItemNotFoundException("Item not found!");
         }
@@ -97,7 +88,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAll(Long userId) {
+    public List<ItemDto> getAll(long userId) {
         return getAll().stream().filter(item -> Objects.equals(item.getOwner()
                 .getId(), userId)).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
