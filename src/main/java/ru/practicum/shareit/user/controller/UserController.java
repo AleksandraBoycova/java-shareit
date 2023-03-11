@@ -1,8 +1,6 @@
 package ru.practicum.shareit.user.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.DuplicateValueException;
 import ru.practicum.shareit.exception.UserNotFoundException;
@@ -27,32 +25,27 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@RequestBody @Valid UserDto userDto) throws ValidationException, DuplicateValueException {
-        UserDto user = service.create(userDto);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public UserDto create(@RequestBody @Valid UserDto userDto) throws ValidationException, DuplicateValueException {
+        return service.create(userDto);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDto> update(@PathVariable long id, @RequestBody @Valid UserDto userDto) throws UserNotFoundException, ValidationException, DuplicateValueException {
-        UserDto user = service.update(id, userDto);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public UserDto update(@PathVariable long id, @RequestBody @Valid UserDto userDto) throws UserNotFoundException, ValidationException, DuplicateValueException {
+        return service.update(id, userDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserDto> delete(@PathVariable long id) throws UserNotFoundException {
-        UserDto user = service.delete(id);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public UserDto delete(@PathVariable long id) throws UserNotFoundException {
+        return service.delete(id);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getById(@PathVariable long id) throws UserNotFoundException {
-        UserDto user = service.getById(id);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public UserDto getById(@PathVariable long id) throws UserNotFoundException {
+        return service.getById(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAll() {
-        List<UserDto> all = service.getAll();
-        return new ResponseEntity<>(all, HttpStatus.OK);
+    public List<UserDto> getAll() {
+        return service.getAll();
     }
 }

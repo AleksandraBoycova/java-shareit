@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UnauthorizedException;
@@ -27,41 +25,35 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<ItemDto> create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                          @RequestBody ItemDto itemDto) throws UserNotFoundException, ValidationException {
-        ItemDto item = service.create(itemDto, userId);
-        return new ResponseEntity<>(item, HttpStatus.OK);
+    public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
+                          @RequestBody ItemDto itemDto) throws UserNotFoundException, ValidationException {
+        return service.create(itemDto, userId);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ItemDto> update(@RequestHeader("X-Sharer-User-Id") long userId,
-                                          @RequestBody ItemDto itemDto, @PathVariable long id) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException {
-        ItemDto item = service.update(id, itemDto, userId);
-        return new ResponseEntity<>(item, HttpStatus.OK);
+    public ItemDto update(@RequestHeader("X-Sharer-User-Id") long userId,
+                          @RequestBody ItemDto itemDto, @PathVariable long id) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException {
+        return service.update(id, itemDto, userId);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ItemDto> delete(@RequestHeader("X-Sharer-User-Id") long userId,
-                                          @PathVariable long id) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException {
-        ItemDto item = service.delete(id, userId);
-        return new ResponseEntity<>(item, HttpStatus.OK);
+    public ItemDto delete(@RequestHeader("X-Sharer-User-Id") long userId,
+                          @PathVariable long id) throws UserNotFoundException, ValidationException, ItemNotFoundException, UnauthorizedException {
+        return service.delete(id, userId);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemDto> getById(@PathVariable long id) throws ItemNotFoundException {
-        ItemDto item = service.getById(id);
-        return new ResponseEntity<>(item, HttpStatus.OK);
+    public ItemDto getById(@PathVariable long id) throws ItemNotFoundException {
+        return service.getById(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
-        List<ItemDto> items = service.getAll(userId);
-        return new ResponseEntity<>(items, HttpStatus.OK);
+    public List<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id") long userId) {
+        return service.getAll(userId);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> search(@RequestParam(name = "text") String text) {
-        List<ItemDto> items = service.search(text);
-        return new ResponseEntity<>(items, HttpStatus.OK);
+    public List<ItemDto> search(@RequestParam(name = "text") String text) {
+        return service.search(text);
     }
 }
