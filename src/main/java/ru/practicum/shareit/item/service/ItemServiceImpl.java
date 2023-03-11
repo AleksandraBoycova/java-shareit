@@ -9,45 +9,42 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-
-    private static Map<Long, Item> STORAGE = new HashMap<>();
-    private static long COUNTER = 1;
-    private UserService userService;
+    private ItemRepository itemRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    public ItemServiceImpl(UserService userService) {
-        this.userService = userService;
+    public ItemServiceImpl(ItemRepository itemRepository, UserRepository userRepository) {
+        this.itemRepository = itemRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public ItemDto create(ItemDto itemDto, long userId) throws UserNotFoundException, ValidationException {
-        User owner = UserMapper.toUser(userService.getById(userId));
+        User owner = userRepository.getById(userId);
         owner.setId(userId);
         validate(itemDto);
         Item item = ItemMapper.toItem(itemDto);
-        item.setId(COUNTER++);
         item.setOwner(owner);
-        STORAGE.put(item.getId(), item);
-        return ItemMapper.toItemDto(item);
+        Item i = itemRepository.save(item);
+        return ItemMapper.toItemDto(i);
     }
 
     @Override
     public ItemDto update(long itemId, ItemDto itemDto, long userId) throws UserNotFoundException, ItemNotFoundException, UnauthorizedException {
-        if (!STORAGE.containsKey(itemId)) {
-            throw new ItemNotFoundException("Item not found!");
-        }
-        UserDto user = userService.getById(userId);
-        Item itemToUpdate = STORAGE.get(itemId);
+
+        User user = userRepository.getById(userId);
+        Item itemToUpdate = itemRepository.getById(itemId);
         if (!Objects.equals(itemToUpdate.getOwner().getId(), userId)) {
             throw new UnauthorizedException("User can not update this item!");
         }
@@ -60,36 +57,30 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             itemToUpdate.setAvailable(itemDto.getAvailable());
         }
-        return ItemMapper.toItemDto(itemToUpdate);
+        Item item = itemRepository.update(itemToUpdate);
+        return ItemMapper.toItemDto(item);
     }
 
     @Override
     public ItemDto delete(long id, long userId) throws ItemNotFoundException, UserNotFoundException, UnauthorizedException {
-        if (!STORAGE.containsKey(id)) {
-            throw new ItemNotFoundException("Item not found!");
-        }
-        UserDto user = userService.getById(userId);
-        Item itemToDelete = STORAGE.get(id);
+        User user = userRepository.getById(userId);
+        Item itemToDelete = itemRepository.getById(id);
         if (!Objects.equals(itemToDelete.getOwner().getId(), userId)) {
             throw new UnauthorizedException("User can not delete this item!");
         }
-        STORAGE.remove(id);
-        COUNTER--;
-        return ItemMapper.toItemDto(itemToDelete);
+        Item item = itemRepository.delete(id);
+        return ItemMapper.toItemDto(item);
     }
 
     @Override
     public ItemDto getById(long id) throws ItemNotFoundException {
-        if (!STORAGE.containsKey(id)) {
-            throw new ItemNotFoundException("Item not found!");
-        }
-        Item item = STORAGE.get(id);
+        Item item = itemRepository.getById(id);
         return ItemMapper.toItemDto(item);
     }
 
     @Override
     public List<ItemDto> getAll(long userId) {
-        return getAll().stream().filter(item -> Objects.equals(item.getOwner()
+        return itemRepository.getAll().stream().filter(item -> Objects.equals(item.getOwner()
                 .getId(), userId)).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
@@ -98,15 +89,11 @@ public class ItemServiceImpl implements ItemService {
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
-        return getAll().stream()
+        return itemRepository.getAll().stream()
                 .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase()) || item.getDescription().toLowerCase().contains(text.toLowerCase()))
                 .filter(Item::isAvailable)
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
-    }
-
-    private List<Item> getAll() {
-        return new ArrayList<>(STORAGE.values());
     }
 
     private void validate(ItemDto itemDto) throws ValidationException {
