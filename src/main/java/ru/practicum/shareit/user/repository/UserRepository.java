@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface UserRepository {
     User save(User user);
+
     User update(User user);
 
     User delete(long id) throws UserNotFoundException;
