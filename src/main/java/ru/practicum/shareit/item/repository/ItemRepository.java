@@ -8,6 +8,7 @@ import java.util.List;
 public interface ItemRepository {
 
     Item save(Item item);
+
     Item update(Item item);
 
     Item delete(long id) throws ItemNotFoundException;
