@@ -1,20 +1,14 @@
 package ru.practicum.shareit.item.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
-public interface ItemRepository {
+@Repository
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Item save(Item item);
-
-    Item update(Item item);
-
-    Item delete(long id) throws ItemNotFoundException;
-
-    Item getById(long id) throws ItemNotFoundException;
-
-    List<Item> getAll();
 
 }
