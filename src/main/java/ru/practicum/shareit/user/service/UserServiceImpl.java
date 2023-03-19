@@ -40,20 +40,21 @@ public class UserServiceImpl implements UserService {
             userToUpdate.setName(userDto.getName());
         }
         if (userDto.getEmail() != null) {
-            boolean emailExists = userRepository.getAll().stream().filter(user -> !Objects.equals(user.getId(), userId)).map(User::getEmail).anyMatch(email -> email.equals(userDto.getEmail()));
+            boolean emailExists = userRepository.findAll().stream().filter(user -> !Objects.equals(user.getId(), userId)).map(User::getEmail).anyMatch(email -> email.equals(userDto.getEmail()));
 
             if (emailExists) {
                 throw new DuplicateValueException("Email exists!");
             }
             userToUpdate.setEmail(userDto.getEmail());
         }
-        User user = userRepository.update(userToUpdate);
+        User user = userRepository.save(userToUpdate);
         return UserMapper.toUserDto(user);
     }
 
     @Override
     public UserDto delete(long id) throws UserNotFoundException {
-        User user = userRepository.delete(id);
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        userRepository.deleteById(id);
         return UserMapper.toUserDto(user);
     }
 
@@ -65,14 +66,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAll() {
-        return userRepository.getAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     private void validateUser(UserDto userDto) throws ValidationException, DuplicateValueException {
         if (userDto.getEmail() == null) {
             throw new ValidationException("Email is null!");
         }
-        boolean containsEmail = userRepository.getAll().stream().anyMatch(user -> user.getEmail().equals(userDto.getEmail()));
+        boolean containsEmail = userRepository.findAll().stream().anyMatch(user -> user.getEmail().equals(userDto.getEmail()));
         if (containsEmail) {
             throw new DuplicateValueException("Email exists");
         }

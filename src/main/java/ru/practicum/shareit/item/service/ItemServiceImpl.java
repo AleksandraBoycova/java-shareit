@@ -57,7 +57,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getAvailable() != null) {
             itemToUpdate.setAvailable(itemDto.getAvailable());
         }
-        Item item = itemRepository.update(itemToUpdate);
+        Item item = itemRepository.save(itemToUpdate);
         return ItemMapper.toItemDto(item);
     }
 
@@ -68,8 +68,8 @@ public class ItemServiceImpl implements ItemService {
         if (!Objects.equals(itemToDelete.getOwner().getId(), userId)) {
             throw new UnauthorizedException("User can not delete this item!");
         }
-        Item item = itemRepository.delete(id);
-        return ItemMapper.toItemDto(item);
+         itemRepository.deleteById(id);
+        return ItemMapper.toItemDto(itemToDelete);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAll(long userId) {
-        return itemRepository.getAll().stream().filter(item -> Objects.equals(item.getOwner()
+        return itemRepository.findAll().stream().filter(item -> Objects.equals(item.getOwner()
                 .getId(), userId)).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
@@ -89,7 +89,7 @@ public class ItemServiceImpl implements ItemService {
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.getAll().stream()
+        return itemRepository.findAll().stream()
                 .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase()) || item.getDescription().toLowerCase().contains(text.toLowerCase()))
                 .filter(Item::isAvailable)
                 .map(ItemMapper::toItemDto)
