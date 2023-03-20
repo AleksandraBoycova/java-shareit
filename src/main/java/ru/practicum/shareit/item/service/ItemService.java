@@ -4,6 +4,7 @@ import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UnauthorizedException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface ItemService {
     List<ItemDto> getAll(long userId);
 
     List<ItemDto> search(String text);
+
+    ItemDto addComment (long userId, long itemId, CommentDto commentDto) throws UserNotFoundException, ItemNotFoundException, UnauthorizedException;
 }

@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS items (
     description VARCHAR(1024) NOT NULL,
     item_name VARCHAR NOT NULL,
     available BOOLEAN DEFAULT TRUE,
-    CONSTRAINT pk_user PRIMARY KEY (id),
+    owner_id BIGINT,
+    CONSTRAINT pk_item PRIMARY KEY (id),
     CONSTRAINT FK_ITEM_OWNER  FOREIGN KEY (owner_id) REFERENCES users (id)
     );
 
@@ -23,7 +24,9 @@ CREATE TABLE IF NOT EXISTS bookings (
    booking_start TIMESTAMP NOT NULL,
    booking_end TIMESTAMP NOT NULL,
     booking_status VARCHAR NOT NULL,
-    CONSTRAINT pk_user PRIMARY KEY (id),
+    owner_id BIGINT,
+    item_id BIGINT,
+    CONSTRAINT pk_booking PRIMARY KEY (id),
     CONSTRAINT FK_BOOKING_OWNER  FOREIGN KEY (owner_id) REFERENCES users (id),
     CONSTRAINT FK_BOOKING_ITEM  FOREIGN KEY (item_id) REFERENCES items (id)
     );

@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(long userId, UserDto userDto) throws UserNotFoundException, DuplicateValueException, ValidationException {
-        User userToUpdate = userRepository.getById(userId);
+        User userToUpdate = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         if (userDto.getName() != null) {
             userToUpdate.setName(userDto.getName());
         }
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getById(long id) throws UserNotFoundException {
-        User user = userRepository.getById(id);
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
         return UserMapper.toUserDto(user);
     }
 

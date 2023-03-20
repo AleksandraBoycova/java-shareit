@@ -1,10 +1,12 @@
 package ru.practicum.shareit.item.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import java.util.List;
 
 
 /**
@@ -22,7 +24,11 @@ public class Item {
     @Column (name = "description", nullable = false, length = 1024)
     private String description;
     private boolean available;
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
-    private ItemRequest request;
-
+    //private ItemRequest request;
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Comment> comments;
 }

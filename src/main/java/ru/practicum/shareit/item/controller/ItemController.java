@@ -6,6 +6,7 @@ import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UnauthorizedException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -56,4 +57,10 @@ public class ItemController {
     public List<ItemDto> search(@RequestParam(name = "text") String text) {
         return service.search(text);
     }
+
+   @PostMapping("{itemId}/comment")
+    public ItemDto addComment (@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId,
+                               @RequestBody CommentDto commentDto) throws UserNotFoundException, UnauthorizedException, ItemNotFoundException {
+        return service.addComment(userId, itemId, commentDto);
+   }
 }
