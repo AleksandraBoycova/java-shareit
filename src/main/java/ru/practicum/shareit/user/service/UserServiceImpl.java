@@ -11,7 +11,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +23,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto create(UserDto userDto) throws ValidationException, DuplicateValueException {
+    public UserDto create(UserDto userDto) throws Exception {
         validateUser(userDto);
         User user = new User();
         user.setName(userDto.getName());
@@ -34,17 +33,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(long userId, UserDto userDto) throws UserNotFoundException, DuplicateValueException, ValidationException {
+    public UserDto update(long userId, UserDto userDto) throws Exception {
         User userToUpdate = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         if (userDto.getName() != null) {
             userToUpdate.setName(userDto.getName());
         }
         if (userDto.getEmail() != null) {
-            boolean emailExists = userRepository.findAll().stream().filter(user -> !Objects.equals(user.getId(), userId)).map(User::getEmail).anyMatch(email -> email.equals(userDto.getEmail()));
-
-            if (emailExists) {
-                throw new DuplicateValueException("Email exists!");
-            }
             userToUpdate.setEmail(userDto.getEmail());
         }
         User user = userRepository.save(userToUpdate);
@@ -52,14 +46,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto delete(long id) throws UserNotFoundException {
+    public UserDto delete(long id) throws Exception {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
         userRepository.deleteById(id);
         return UserMapper.toUserDto(user);
     }
 
     @Override
-    public UserDto getById(long id) throws UserNotFoundException {
+    public UserDto getById(long id) throws Exception {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
         return UserMapper.toUserDto(user);
     }
@@ -72,10 +66,6 @@ public class UserServiceImpl implements UserService {
     private void validateUser(UserDto userDto) throws ValidationException, DuplicateValueException {
         if (userDto.getEmail() == null) {
             throw new ValidationException("Email is null!");
-        }
-        boolean containsEmail = userRepository.findAll().stream().anyMatch(user -> user.getEmail().equals(userDto.getEmail()));
-        if (containsEmail) {
-            throw new DuplicateValueException("Email exists");
         }
         if (userDto.getName() == null || userDto.getName().isBlank()) {
             throw new ValidationException("Name is null or empty");

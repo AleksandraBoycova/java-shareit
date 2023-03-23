@@ -9,9 +9,10 @@ public class CommentMapper {
         CommentDto commentDto = new CommentDto();
         commentDto.setId(comment.getId());
         commentDto.setText(comment.getText());
-        commentDto.setItem(comment.getItem().getId());
-        commentDto.setAuthor(comment.getAuthor().getId());
+        commentDto.setItem(comment.getItem());
+        commentDto.setAuthor(comment.getAuthor());
         commentDto.setCreated(comment.getCreated());
+        commentDto.setAuthorName(comment.getAuthor().getName());
         return commentDto;
 
     }
