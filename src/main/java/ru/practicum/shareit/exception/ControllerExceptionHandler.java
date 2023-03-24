@@ -17,11 +17,19 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ApplicationError> handleValidationException(ValidationException e) {
         ApplicationError applicationError = new ApplicationError(HttpStatus.BAD_REQUEST, e);
+        applicationError.setError(e.getMessage());
         log.error("Validation Exception Thrown");
         return new ResponseEntity<>(applicationError, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({ItemNotFoundException.class, UserNotFoundException.class})
+    @ExceptionHandler(ItemNotAvailableException.class)
+    public ResponseEntity<ApplicationError> handleItemNotAvailableException(ItemNotAvailableException e) {
+        ApplicationError applicationError = new ApplicationError(HttpStatus.BAD_REQUEST, e);
+        log.error("ItemNotAvailableException Exception Thrown");
+        return new ResponseEntity<>(applicationError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ItemNotFoundException.class, UserNotFoundException.class, BookingNotFoundException.class})
     public ResponseEntity<ApplicationError> handleNotFoundException(Exception e) {
         ApplicationError applicationError = new ApplicationError(HttpStatus.NOT_FOUND, "Объект не найден", e);
         log.error("Not found exception thrown");
@@ -29,23 +37,22 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler()
-    public ResponseEntity<ApplicationError> handleException(Exception e) {
-        ApplicationError applicationError = new ApplicationError(HttpStatus.INTERNAL_SERVER_ERROR, "Произошла ошибка", e);
+    public ResponseEntity<String> handleException(Exception e) {
         log.error("Unexpected exception thrown");
-        return new ResponseEntity<>(applicationError, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApplicationError> methodArgumentNotValidException(MethodArgumentNotValidException e) {
-        StringBuilder errorMessage = new StringBuilder();
-        List<FieldError> allErrors = e.getBindingResult().getFieldErrors();
+        StringBuilder    errorMessage = new StringBuilder();
+        List<FieldError> allErrors    = e.getBindingResult().getFieldErrors();
         for (FieldError error : allErrors) {
             errorMessage.append("Field: ").append(error.getField());
             errorMessage.append(", rejected value: ").append(error.getRejectedValue());
             errorMessage.append(" error: ").append(error.getDefaultMessage());
         }
         ApplicationError applicationError = new ApplicationError(HttpStatus.BAD_REQUEST, "Ошибка валидации. " + errorMessage, e);
-        MethodParameter parameter = e.getParameter();
+        MethodParameter  parameter        = e.getParameter();
         parameter.getAnnotatedElement();
         log.error("Method Argument Not Valid Exception");
         return new ResponseEntity<>(applicationError, HttpStatus.BAD_REQUEST);

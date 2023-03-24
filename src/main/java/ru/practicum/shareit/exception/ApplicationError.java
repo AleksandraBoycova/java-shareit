@@ -18,7 +18,7 @@ public class ApplicationError {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime timestamp;
 
-    private String message;
+    private String error;
 
     private List<ApiSubError> errors;
 
@@ -35,16 +35,16 @@ public class ApplicationError {
     public ApplicationError(HttpStatus status, Exception ex) {
         this();
         this.status = status;
-        this.message = "Ошибка валидации";
+        this.error = "Ошибка валидации";
         if (ex instanceof ApiSubError) {
             errors.add((ApiSubError) ex);
         }
     }
 
-    public ApplicationError(HttpStatus status, String message, Exception ex) {
+    public ApplicationError(HttpStatus status, String error, Exception ex) {
         this();
         this.status = status;
-        this.message = message;
+        this.error = error;
         if (ex instanceof ApiSubError) {
             errors.add((ApiSubError) ex);
         }

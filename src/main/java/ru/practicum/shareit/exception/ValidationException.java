@@ -22,5 +22,6 @@ public class ValidationException extends Exception implements ApiSubError {
 
     public ValidationException(String message) {
         super(message);
+        this.message = message;
     }
 }
