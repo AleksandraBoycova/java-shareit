@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    private ItemRepository    itemRepository;
-    private UserRepository    userRepository;
+    private ItemRepository itemRepository;
+    private UserRepository userRepository;
     private BookingRepository bookingRepository;
     private CommentRepository commentRepository;
 
@@ -47,7 +47,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(ItemDto itemDto, long userId) throws Exception {
         validate(itemDto);
         User owner = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        Item item  = ItemMapper.toItem(itemDto);
+        Item item = ItemMapper.toItem(itemDto);
         item.setOwner(owner);
         Item i = itemRepository.save(item);
         return ItemMapper.toItemDto(i);
@@ -56,7 +56,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(long itemId, ItemDto itemDto, long userId) throws Exception {
 
-        User user         = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Item itemToUpdate = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         if (!Objects.equals(itemToUpdate.getOwner().getId(), userId)) {
             throw new UnauthorizedException("User can not update this item!");
@@ -76,7 +76,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto delete(long id, long userId) throws Exception {
-        User user         = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Item itemToDelete = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         if (!Objects.equals(itemToDelete.getOwner().getId(), userId)) {
             throw new UnauthorizedException("User can not delete this item!");
@@ -100,15 +100,16 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getAll(long userId) {
         return itemRepository.findAll().stream().filter(item -> Objects.equals(item.getOwner()
-                .getId(), userId)).map(item -> {
-            if (item.getOwner().getId().equals(userId)) {
-                ItemDto itemDto = ItemMapper.toItemDto(item);
-                setLastAndNextBookingForItem(itemDto);
-                return itemDto;
-            } else {
-                return ItemMapper.toItemDto(item);
-            }
-        }).collect(Collectors.toList());
+                        .getId(), userId)).map(item -> {
+                    if (item.getOwner().getId().equals(userId)) {
+                        ItemDto itemDto = ItemMapper.toItemDto(item);
+                        setLastAndNextBookingForItem(itemDto);
+                        return itemDto;
+                    } else {
+                        return ItemMapper.toItemDto(item);
+                    }
+                }).sorted(Comparator.comparing(ItemDto::getId))
+                .collect(Collectors.toList());
     }
 
     private void setLastAndNextBookingForItem(ItemDto itemDto) {
