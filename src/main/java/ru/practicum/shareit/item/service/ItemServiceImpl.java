@@ -116,12 +116,14 @@ public class ItemServiceImpl implements ItemService {
                 .filter(booking -> booking.getItem().getId().equals(itemDto.getId())
                         && booking.getStatus().equals(BookingState.APPROVED))
                 .collect(Collectors.toList());
+        LocalDateTime now = LocalDateTime.now();
         Booking last = allApprovedBookingsForItem.stream()
-                .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
-                .min(Comparator.comparing(Booking::getStart))
+                .filter(booking -> booking.getEnd().isBefore(now)
+                        || (booking.getStart().isBefore(now) && booking.getEnd().isAfter(now)))
+                .max(Comparator.comparing(Booking::getStart))
                 .orElse(null);
         Booking next = allApprovedBookingsForItem.stream()
-                .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
+                .filter(booking -> booking.getStart().isAfter(now))
                 .min(Comparator.comparing(Booking::getStart))
                 .orElse(null);
         itemDto.setLastBooking(last == null ? null : BookingMapper.toBookingDto(last));
@@ -147,15 +149,16 @@ public class ItemServiceImpl implements ItemService {
         }
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Item not found"));
+        LocalDateTime now = LocalDateTime.now();
         boolean userBookedItem = bookingRepository.findAllByBookerId(userId).stream()
                 .anyMatch(booking -> Objects.equals(booking.getItem().getId(), item.getId())
                         && booking.getStatus().equals(BookingState.APPROVED)
-                        && booking.getStart().isBefore(LocalDateTime.now()));
+                        && booking.getStart().isBefore(now));
         if (!userBookedItem) {
             throw new ValidationException("Unauthorized");
         }
         Comment comment = new Comment();
-        comment.setCreated(LocalDateTime.now());
+        comment.setCreated(now);
         comment.setAuthor(user);
         comment.setText(commentDto.getText());
         comment.setItem(item);

@@ -105,16 +105,17 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private Predicate<Booking> getBookingPredicateByStatus(String status, Predicate<Booking> filter) throws ValidationException {
+        LocalDateTime now = LocalDateTime.now();
         switch (status) {
             case "CURRENT":
-                filter = filter.and(booking -> booking.getStart().isBefore(LocalDateTime.now())
-                        && booking.getEnd().isAfter(LocalDateTime.now())
+                filter = filter.and(booking -> booking.getStart().isBefore(now)
+                        && booking.getEnd().isAfter(now)
                         && (booking.getStatus().equals(BookingState.APPROVED) || booking.getStatus().equals(BookingState.WAITING))
                         || booking.getStatus().equals(BookingState.REJECTED));
                 break;
             case "PAST":
                 filter = filter.and(booking -> booking.getStatus().equals(BookingState.APPROVED)
-                        && booking.getEnd().isBefore(LocalDateTime.now()));
+                        && booking.getEnd().isBefore(now));
                 break;
             case "WAITING":
                 filter = filter.and(booking -> booking.getStatus().equals(BookingState.WAITING));
@@ -123,7 +124,7 @@ public class BookingServiceImpl implements BookingService {
                 filter = filter.and(booking -> booking.getStatus().equals(BookingState.REJECTED));
                 break;
             case "FUTURE":
-                filter = filter.and(booking -> booking.getStart().isAfter(LocalDateTime.now())
+                filter = filter.and(booking -> booking.getStart().isAfter(now)
                         && (booking.getStatus().equals(BookingState.APPROVED) || booking.getStatus().equals(BookingState.WAITING)));
                 break;
             case "ALL":
@@ -155,7 +156,8 @@ public class BookingServiceImpl implements BookingService {
         if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
             throw new ValidationException("Start or End is null");
         }
-        if (bookingDto.getStart().isBefore(LocalDateTime.now()) || bookingDto.getEnd().isBefore(LocalDateTime.now())
+        LocalDateTime now = LocalDateTime.now();
+        if (bookingDto.getStart().isBefore(now) || bookingDto.getEnd().isBefore(now)
                 || bookingDto.getStart().equals(bookingDto.getEnd())
                 || bookingDto.getStart().isAfter(bookingDto.getEnd())) {
             throw new ValidationException("Start or End is wrong");

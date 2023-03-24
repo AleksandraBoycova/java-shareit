@@ -14,14 +14,14 @@ import java.time.LocalDateTime;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String text;
+    private Long          id;
+    private String        text;
     @ManyToOne
     @JoinColumn(name = "item")
     @JsonBackReference
-    private Item item;
+    private Item          item;
     @OneToOne
     @JoinColumn(name = "author")
-    private User author;
+    private User          author;
     private LocalDateTime created;
 }
