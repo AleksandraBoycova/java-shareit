@@ -30,7 +30,7 @@ public class ItemMapper {
 
     }
 
-    public static ItemDtoShort toItemDtoShort (Item item) {
+    public static ItemDtoShort toItemDtoShort(Item item) {
         ItemDtoShort itemDtoShort = new ItemDtoShort();
         itemDtoShort.setId(item.getId());
         itemDtoShort.setName(item.getName());
