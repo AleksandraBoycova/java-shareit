@@ -16,13 +16,12 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
 public class BookingServiceImpl implements BookingService {
-    private UserRepository    userRepository;
-    private ItemRepository    itemRepository;
+    private UserRepository userRepository;
+    private ItemRepository itemRepository;
     private BookingRepository bookingRepository;
 
     @Autowired
@@ -38,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setStatus(BookingState.WAITING);
         User booker = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        Item item   = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() -> new ItemNotFoundException("Item not found"));
+        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         if (item.getOwner().getId().equals(booker.getId())) {
             throw new ItemNotFoundException("Item not found");
         }
@@ -53,9 +52,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto update(long bookingId, BookingDto bookingDto, long userId, Boolean approved) throws Exception {
-        User    booker  = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User booker = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException("Booking not found"));
-        Item    item    = itemRepository.findById(booking.getItem().getId()).orElseThrow(() -> new ItemNotFoundException("Item not found"));
+        Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         if (approved == null && bookingDto.getStart() == null && bookingDto.getEnd() == null) {
             throw new ValidationException("Error");
         }
@@ -84,7 +83,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto getById(long id, long userId) throws Exception {
-        User    booker  = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User booker = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Booking booking = bookingRepository.findById(id).orElseThrow(() -> new BookingNotFoundException("Booking not found"));
         if (booking.getItem().getOwner().equals(booker) || booking.getBooker().equals(booker)) {
             return BookingMapper.toBookingDto(booking);
@@ -95,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAll(long userId, String status) throws Exception {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        List<Booking> bookings = getBookingPredicateByStatus(status,  userId);
+        List<Booking> bookings = getBookingPredicateByStatus(status, userId);
 
         return bookings.stream()
                 .map(BookingMapper::toBookingDto)
