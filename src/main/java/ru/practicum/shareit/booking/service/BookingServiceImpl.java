@@ -94,14 +94,14 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAll(long userId, String status) throws Exception {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        List<Booking> bookings = getBookingPredicateByStatus(status, userId);
+        List<Booking> bookings = getBookingsByStatusForBooker(status, userId);
 
         return bookings.stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
-    private List<Booking> getBookingPredicateByStatus(String status, Long userId) throws ValidationException {
+    private List<Booking> getBookingsByStatusForBooker(String status, Long userId) throws ValidationException {
         LocalDateTime now = LocalDateTime.now();
         switch (status) {
             case "CURRENT":
@@ -121,13 +121,33 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    private List<Booking> getBookingsByStatusForOwner(String status, Long userId) throws ValidationException {
+        LocalDateTime now = LocalDateTime.now();
+        switch (status) {
+            case "CURRENT":
+                return bookingRepository.findAllByItemOwnerIdAndStatusInAndStartBeforeAndEndAfterOrderByStartDesc(userId, List.of(BookingState.APPROVED, BookingState.WAITING, BookingState.REJECTED), now, now);
+            case "PAST":
+                return bookingRepository.findAllByItemOwnerIdAndEndBeforeAndStatusOrderByStartDesc(userId, now, BookingState.APPROVED);
+            case "WAITING":
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingState.WAITING);
+            case "REJECTED":
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingState.REJECTED);
+            case "FUTURE":
+                return bookingRepository.findAllByItemOwnerIdAndStatusInAndStartAfterOrderByStartDesc(userId, List.of(BookingState.APPROVED, BookingState.WAITING), now);
+            case "ALL":
+                return bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
+            default:
+                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        }
+    }
+
     @Override
     public List<BookingDto> getItemsForUser(long userId, String status) throws Exception {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         if (itemRepository.findAll().stream().noneMatch(item -> item.getOwner().getId().equals(userId))) {
             throw new UnauthorizedException("Unauthorized");
         }
-        List<Booking> bookings = getBookingPredicateByStatus(status, userId);
+        List<Booking> bookings = getBookingsByStatusForOwner(status, userId);
 
         return bookings.stream()
                 .map(BookingMapper::toBookingDto)
