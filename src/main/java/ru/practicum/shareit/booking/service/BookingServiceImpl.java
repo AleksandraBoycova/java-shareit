@@ -95,44 +95,31 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAll(long userId, String status) throws Exception {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        Predicate<Booking> filter = getBookingPredicateByStatus(status, booking -> booking.getBooker().getId() == userId);
+        List<Booking> bookings = getBookingPredicateByStatus(status,  userId);
 
-        return bookingRepository.findAll().stream()
-                .filter(filter)
+        return bookings.stream()
                 .map(BookingMapper::toBookingDto)
-                .sorted((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
                 .collect(Collectors.toList());
     }
 
-    private Predicate<Booking> getBookingPredicateByStatus(String status, Predicate<Booking> filter) throws ValidationException {
+    private List<Booking> getBookingPredicateByStatus(String status, Long userId) throws ValidationException {
         LocalDateTime now = LocalDateTime.now();
         switch (status) {
             case "CURRENT":
-                filter = filter.and(booking -> booking.getStart().isBefore(now)
-                        && booking.getEnd().isAfter(now)
-                        && (booking.getStatus().equals(BookingState.APPROVED) || booking.getStatus().equals(BookingState.WAITING))
-                        || booking.getStatus().equals(BookingState.REJECTED));
-                break;
+                return bookingRepository.findAllByBookerIdAndStatusInAndStartBeforeAndEndAfterOrderByStartDesc(userId, List.of(BookingState.APPROVED, BookingState.WAITING, BookingState.REJECTED), now, now);
             case "PAST":
-                filter = filter.and(booking -> booking.getStatus().equals(BookingState.APPROVED)
-                        && booking.getEnd().isBefore(now));
-                break;
+                return bookingRepository.findAllByBookerIdAndEndBeforeAndStatusOrderByStartDesc(userId, now, BookingState.APPROVED);
             case "WAITING":
-                filter = filter.and(booking -> booking.getStatus().equals(BookingState.WAITING));
-                break;
+                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingState.WAITING);
             case "REJECTED":
-                filter = filter.and(booking -> booking.getStatus().equals(BookingState.REJECTED));
-                break;
+                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingState.REJECTED);
             case "FUTURE":
-                filter = filter.and(booking -> booking.getStart().isAfter(now)
-                        && (booking.getStatus().equals(BookingState.APPROVED) || booking.getStatus().equals(BookingState.WAITING)));
-                break;
+                return bookingRepository.findAllByBookerIdAndStatusInAndStartAfterOrderByStartDesc(userId, List.of(BookingState.APPROVED, BookingState.WAITING), now);
             case "ALL":
-                break;
+                return bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
             default:
                 throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
         }
-        return filter;
     }
 
     @Override
@@ -141,12 +128,9 @@ public class BookingServiceImpl implements BookingService {
         if (itemRepository.findAll().stream().noneMatch(item -> item.getOwner().getId().equals(userId))) {
             throw new UnauthorizedException("Unauthorized");
         }
-        Predicate<Booking> filter = getBookingPredicateByStatus(status, booking -> booking.getItem().getOwner().getId() == userId);
+        List<Booking> bookings = getBookingPredicateByStatus(status, userId);
 
-        List<Booking> bookingList = bookingRepository.findAll();
-        return bookingList.stream()
-                .filter(filter)
-                .sorted((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
+        return bookings.stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
 
