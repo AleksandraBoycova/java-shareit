@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingState;
 import ru.practicum.shareit.booking.model.Booking;
@@ -87,24 +86,35 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getById(long id, long userId) throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+
         Item item = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         if (!item.getOwner().getId().equals(userId)) {
             return ItemMapper.toItemDto(item);
         }
         ItemDto itemDto = ItemMapper.toItemDto(item);
-        setLastAndNextBookingForItem(itemDto);
+
+        List<Booking> lastBookingsList = bookingRepository.findAllByItemIdInAndStatusAndEndBeforeOrStartBeforeAndEndAfter(List.of(item.getId()), BookingState.APPROVED, now, now, now);
+        List<Booking> nextBookingList = bookingRepository.findAllByItemIdInAndStatusAndStartAfter(List.of(item.getId()), BookingState.APPROVED, now);
+        Map<Long, List<Booking>> last = lastBookingsList.stream().collect(Collectors.groupingBy(booking -> booking.getItem().getId(), Collectors.collectingAndThen(toList(),
+                e -> e.stream().sorted(Comparator.comparing(Booking::getStart))
+                        .collect(toList()))));
+        Map<Long, List<Booking>> next = nextBookingList.stream().collect(Collectors.groupingBy(booking -> booking.getItem().getId(), Collectors.collectingAndThen(toList(),
+                e -> e.stream().sorted(Comparator.comparing(Booking::getStart))
+                        .collect(toList()))));
+        itemDto.setLastBooking(last.get(item.getId()) == null ? null : BookingMapper.toBookingDto(last.get(item.getId()).get(lastBookingsList.size() - 1)));
+        itemDto.setNextBooking(next.get(item.getId()) == null ? null : BookingMapper.toBookingDto(next.get(item.getId()).get(0)));
         return itemDto;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ItemDto> getAll(long userId) {
-        LocalDateTime now              = LocalDateTime.now();
-        List<Item>    itemsByOwnerId   = itemRepository.findAllByOwnerId(userId);
-        List<Long>    ownerItemIds     = itemsByOwnerId.stream().map(Item::getId).collect(toList());
+        LocalDateTime now = LocalDateTime.now();
+        List<Item> itemsByOwnerId = itemRepository.findAllByOwnerId(userId);
+        List<Long> ownerItemIds = itemsByOwnerId.stream().map(Item::getId).collect(toList());
         List<Booking> lastBookingsList = bookingRepository.findAllByItemIdInAndStatusAndEndBeforeOrStartBeforeAndEndAfter(ownerItemIds, BookingState.APPROVED, now, now, now);
-        List<Booking> nextBookingList  = bookingRepository.findAllByItemIdInAndStatusAndStartAfter(ownerItemIds, BookingState.APPROVED, now);
+        List<Booking> nextBookingList = bookingRepository.findAllByItemIdInAndStatusAndStartAfter(ownerItemIds, BookingState.APPROVED, now);
         Map<Long, List<Booking>> last = lastBookingsList.stream().collect(Collectors.groupingBy(booking -> booking.getItem().getId(), Collectors.collectingAndThen(toList(),
                 e -> e.stream().sorted(Comparator.comparing(Booking::getStart))
                         .collect(toList()))));
@@ -121,33 +131,12 @@ public class ItemServiceImpl implements ItemService {
         return itemDtos;
     }
 
-    private void setLastAndNextBookingForItem(ItemDto itemDto) {
-        List<Booking> allApprovedBookingsForItem = bookingRepository.findAll().stream()
-                .filter(booking -> booking.getItem().getId().equals(itemDto.getId())
-                        && booking.getStatus().equals(BookingState.APPROVED))
-                .collect(toList());
-        LocalDateTime now = LocalDateTime.now();
-        Booking last = allApprovedBookingsForItem.stream()
-                .filter(booking -> booking.getEnd().isBefore(now)
-                        || (booking.getStart().isBefore(now) && booking.getEnd().isAfter(now)))
-                .max(Comparator.comparing(Booking::getStart))
-                .orElse(null);
-        Booking next = allApprovedBookingsForItem.stream()
-                .filter(booking -> booking.getStart().isAfter(now))
-                .min(Comparator.comparing(Booking::getStart))
-                .orElse(null);
-        itemDto.setLastBooking(last == null ? null : BookingMapper.toBookingDto(last));
-        itemDto.setNextBooking(next == null ? null : BookingMapper.toBookingDto(next));
-    }
-
     @Override
     public List<ItemDto> search(String text) {
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.findAll().stream()
-                .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase()) || item.getDescription().toLowerCase().contains(text.toLowerCase()))
-                .filter(Item::isAvailable)
+        return itemRepository.findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrueOrderById(text, text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(toList());
     }
