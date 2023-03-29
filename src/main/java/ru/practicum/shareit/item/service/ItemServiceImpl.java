@@ -97,8 +97,8 @@ public class ItemServiceImpl implements ItemService {
 
         List<Booking> lastBookingsList = bookingRepository.findAllByItemIdInAndStatusAndEndBeforeOrStartBeforeAndEndAfter(List.of(item.getId()), BookingState.APPROVED, now, now, now);
         List<Booking> nextBookingList = bookingRepository.findAllByItemIdInAndStatusAndStartAfter(List.of(item.getId()), BookingState.APPROVED, now);
-        itemDto.setLastBooking(lastBookingsList.isEmpty() ? null : BookingMapper.toBookingDto(lastBookingsList.get(lastBookingsList.size() - 1)));
-        itemDto.setNextBooking(nextBookingList.isEmpty() ? null : BookingMapper.toBookingDto(nextBookingList.get(0)));
+        itemDto.setLastBooking(lastBookingsList.isEmpty() ? null : BookingMapper.toBookingDto(lastBookingsList.stream().max(Comparator.comparing(Booking::getStart)).get()));
+        itemDto.setNextBooking(nextBookingList.isEmpty() ? null : BookingMapper.toBookingDto(nextBookingList.stream().min(Comparator.comparing(Booking::getStart)).get()));
         return itemDto;
     }
 
