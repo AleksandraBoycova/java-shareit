@@ -95,12 +95,10 @@ public class ItemServiceImpl implements ItemService {
         }
         ItemDto itemDto = ItemMapper.toItemDto(item);
 
-        List<Booking> lastBookingsList = bookingRepository.findAllByItemIdInAndStatusAndEndBeforeOrStartBeforeAndEndAfter(List.of(item.getId()), BookingState.APPROVED, now, now, now);
-        List<Booking> nextBookingList = bookingRepository.findAllByItemIdInAndStatusAndStartAfter(List.of(item.getId()), BookingState.APPROVED, now);
-        List<Booking> sortedLast = lastBookingsList.stream().sorted(Comparator.comparing(Booking::getStart)).collect(toList());
-        List<Booking> sortedNext = nextBookingList.stream().sorted(Comparator.comparing(Booking::getStart)).collect(toList());
-        itemDto.setLastBooking(sortedLast.isEmpty() ? null : BookingMapper.toBookingDto(sortedLast.get(sortedLast.size() - 1)));
-        itemDto.setNextBooking(sortedNext.isEmpty() ? null : BookingMapper.toBookingDto(sortedNext.get(0)));
+        List<Booking> lastBookingsList = bookingRepository.findAllByItemIdInAndStatusAndEndBeforeOrderByEndDesc(List.of(item.getId()), BookingState.APPROVED, now);
+        List<Booking> nextBookingList = bookingRepository.findAllByItemIdInAndStatusAndStartAfterOrderByStart(List.of(item.getId()), BookingState.APPROVED, now);
+        itemDto.setLastBooking(lastBookingsList.isEmpty() ? null : BookingMapper.toBookingDto(lastBookingsList.get(0)));
+        itemDto.setNextBooking(nextBookingList.isEmpty() ? null : BookingMapper.toBookingDto(nextBookingList.get(0)));
         return itemDto;
     }
 
