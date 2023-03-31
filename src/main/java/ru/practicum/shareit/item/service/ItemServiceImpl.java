@@ -22,16 +22,15 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    private ItemRepository    itemRepository;
-    private UserRepository    userRepository;
+    private ItemRepository itemRepository;
+    private UserRepository userRepository;
     private BookingRepository bookingRepository;
     private CommentRepository commentRepository;
 
@@ -47,7 +46,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(ItemDto itemDto, long userId) throws Exception {
         validate(itemDto);
         User owner = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        Item item  = ItemMapper.toItem(itemDto);
+        Item item = ItemMapper.toItem(itemDto);
         item.setOwner(owner);
         Item i = itemRepository.save(item);
         return ItemMapper.toItemDto(i);
@@ -56,7 +55,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(long itemId, ItemDto itemDto, long userId) throws Exception {
 
-        User user         = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Item itemToUpdate = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         if (!Objects.equals(itemToUpdate.getOwner().getId(), userId)) {
             throw new UnauthorizedException("User can not update this item!");
@@ -76,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto delete(long id, long userId) throws Exception {
-        User user         = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Item itemToDelete = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         if (!Objects.equals(itemToDelete.getOwner().getId(), userId)) {
             throw new UnauthorizedException("User can not delete this item!");
@@ -87,47 +86,43 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getById(long id, long userId) throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+
         Item item = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         if (!item.getOwner().getId().equals(userId)) {
             return ItemMapper.toItemDto(item);
         }
         ItemDto itemDto = ItemMapper.toItemDto(item);
-        setLastAndNextBookingForItem(itemDto);
+
+        List<Booking> lastBookingsList = bookingRepository.findAllByItemIdInAndStatusAndStartBeforeOrderByStartDesc(List.of(item.getId()), BookingState.APPROVED, now);
+        List<Booking> nextBookingList = bookingRepository.findAllByItemIdInAndStatusAndStartAfterOrderByStart(List.of(item.getId()), BookingState.APPROVED, now);
+        itemDto.setLastBooking(lastBookingsList.isEmpty() ? null : BookingMapper.toBookingDto(lastBookingsList.get(0)));
+        itemDto.setNextBooking(nextBookingList.isEmpty() ? null : BookingMapper.toBookingDto(nextBookingList.get(0)));
         return itemDto;
     }
 
     @Override
     public List<ItemDto> getAll(long userId) {
-        return itemRepository.findAll().stream().filter(item -> Objects.equals(item.getOwner()
-                .getId(), userId)).map(item -> {
-            if (item.getOwner().getId().equals(userId)) {
-                ItemDto itemDto = ItemMapper.toItemDto(item);
-                setLastAndNextBookingForItem(itemDto);
-                return itemDto;
-            } else {
-                return ItemMapper.toItemDto(item);
-            }
-        }).collect(Collectors.toList());
-    }
-
-    private void setLastAndNextBookingForItem(ItemDto itemDto) {
-        List<Booking> allApprovedBookingsForItem = bookingRepository.findAll().stream()
-                .filter(booking -> booking.getItem().getId().equals(itemDto.getId())
-                        && booking.getStatus().equals(BookingState.APPROVED))
-                .collect(Collectors.toList());
         LocalDateTime now = LocalDateTime.now();
-        Booking last = allApprovedBookingsForItem.stream()
-                .filter(booking -> booking.getEnd().isBefore(now)
-                        || (booking.getStart().isBefore(now) && booking.getEnd().isAfter(now)))
-                .max(Comparator.comparing(Booking::getStart))
-                .orElse(null);
-        Booking next = allApprovedBookingsForItem.stream()
-                .filter(booking -> booking.getStart().isAfter(now))
-                .min(Comparator.comparing(Booking::getStart))
-                .orElse(null);
-        itemDto.setLastBooking(last == null ? null : BookingMapper.toBookingDto(last));
-        itemDto.setNextBooking(next == null ? null : BookingMapper.toBookingDto(next));
+        List<Item> itemsByOwnerId = itemRepository.findAllByOwnerId(userId);
+        List<Long> ownerItemIds = itemsByOwnerId.stream().map(Item::getId).collect(toList());
+        List<Booking> lastBookingsList = bookingRepository.findAllByItemIdInAndStatusAndEndBeforeOrStartBeforeAndEndAfter(ownerItemIds, BookingState.APPROVED, now, now, now);
+        List<Booking> nextBookingList = bookingRepository.findAllByItemIdInAndStatusAndStartAfter(ownerItemIds, BookingState.APPROVED, now);
+        Map<Long, List<Booking>> last = lastBookingsList.stream().collect(Collectors.groupingBy(booking -> booking.getItem().getId(), Collectors.collectingAndThen(toList(),
+                e -> e.stream().sorted(Comparator.comparing(Booking::getStart))
+                        .collect(toList()))));
+        Map<Long, List<Booking>> next = nextBookingList.stream().collect(Collectors.groupingBy(booking -> booking.getItem().getId(), Collectors.collectingAndThen(toList(),
+                e -> e.stream().sorted(Comparator.comparing(Booking::getStart))
+                        .collect(toList()))));
+        List<ItemDto> itemDtos = new ArrayList<>();
+        itemsByOwnerId.forEach(item -> {
+            ItemDto itemDto = ItemMapper.toItemDto(item);
+            itemDto.setLastBooking(last.get(item.getId()) == null ? null : BookingMapper.toBookingDto(last.get(item.getId()).get(lastBookingsList.size() - 1)));
+            itemDto.setNextBooking(next.get(item.getId()) == null ? null : BookingMapper.toBookingDto(next.get(item.getId()).get(0)));
+            itemDtos.add(itemDto);
+        });
+        return itemDtos;
     }
 
     @Override
@@ -135,11 +130,9 @@ public class ItemServiceImpl implements ItemService {
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.findAll().stream()
-                .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase()) || item.getDescription().toLowerCase().contains(text.toLowerCase()))
-                .filter(Item::isAvailable)
+        return itemRepository.findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrueOrderById(text, text).stream()
                 .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
