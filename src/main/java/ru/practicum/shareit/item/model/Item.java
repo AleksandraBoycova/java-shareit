@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -22,7 +24,10 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
-    //private ItemRequest request;
+    @ManyToOne
+    @JoinColumn("request_id")
+    @JsonBackReference
+    private ItemRequest request;
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Comment> comments;

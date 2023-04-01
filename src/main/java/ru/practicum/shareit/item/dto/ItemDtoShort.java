@@ -6,4 +6,5 @@ import lombok.Data;
 public class ItemDtoShort {
     private long id;
     private String name;
+    private Long owner;
 }
