@@ -6,11 +6,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -20,11 +18,15 @@ import java.util.Set;
 @Entity
 @Table(name = "item_requests")
 public class ItemRequest {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String description;
-    private User requestor;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "requester_id")
+    private User          requestor;
     @CreationTimestamp
-    private LocalDate created;
+    private LocalDateTime created;
 
     @OneToMany (mappedBy = "request", cascade = CascadeType.ALL)
     @JsonManagedReference

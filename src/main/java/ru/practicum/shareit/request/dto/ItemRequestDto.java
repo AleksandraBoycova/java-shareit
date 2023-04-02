@@ -4,6 +4,7 @@ import lombok.Data;
 import ru.practicum.shareit.item.dto.ItemDtoShort;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -12,7 +13,7 @@ public class ItemRequestDto {
     private String description;
     private Long requestor;
 
-    private LocalDate created;
+    private LocalDateTime created;
 
     private Set<ItemDtoShort> items;
 }

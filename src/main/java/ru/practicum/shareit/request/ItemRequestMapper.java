@@ -13,7 +13,7 @@ public class ItemRequestMapper {
         itemRequestDto.setDescription(itemRequest.getDescription());
         itemRequestDto.setRequestor(itemRequest.getRequestor().getId());
         itemRequestDto.setCreated(itemRequest.getCreated());
-        itemRequestDto.setItems(itemRequest.getItems().stream().map(ItemMapper::toItemDtoShort).collect(Collectors.toSet()));
+        itemRequestDto.setItems(itemRequest.getItems() == null ? null : itemRequest.getItems().stream().map(ItemMapper::toItemDtoShort).collect(Collectors.toSet()));
         return itemRequestDto;
     }
 

@@ -11,8 +11,8 @@ public interface BookingService {
 
     BookingDto getById(long id, long userId) throws Exception;
 
-    List<BookingDto> getAll(long userId, String status) throws Exception;
+    List<BookingDto> getAll(long userId, String status, Integer from, Integer size) throws Exception;
 
-    List<BookingDto> getItemsForUser(long userId, String status) throws Exception;
+    List<BookingDto> getItemsForUser(long userId, String status, Integer from, Integer size) throws Exception;
 
 }

@@ -13,6 +13,7 @@ public class ItemMapper {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.isAvailable());
+        itemDto.setRequestId(item.getRequest() == null ? null : item.getRequest().getId());
         if (item.getComments() != null) {
             itemDto.setComments(item.getComments().stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()));
         }
