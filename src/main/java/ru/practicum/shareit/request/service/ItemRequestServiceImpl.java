@@ -1,25 +1,29 @@
 package ru.practicum.shareit.request.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.ItemRequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.ItemRequestMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemRequestServiceImpl implements ItemRequestService {
-    private UserRepository userRepository;
+    private UserRepository        userRepository;
     private ItemRequestRepository itemRequestRepository;
-    private ItemRepository itemRepository;
+    private ItemRepository        itemRepository;
 
     @Autowired
     public ItemRequestServiceImpl(UserRepository userRepository, ItemRequestRepository itemRequestRepository, ItemRepository itemRepository) {
@@ -30,31 +34,60 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto create(ItemRequestDto requestDto, Long userId) throws Exception {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ValidationException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         validate(requestDto);
         ItemRequest itemRequest = new ItemRequest();
-        itemRequest.setRequestor(user);
+        itemRequest.setRequester(user);
         itemRequest.setDescription(requestDto.getDescription());
-        itemRequestRepository.save(itemRequest);
-        return null;
+        ItemRequest savedRequest = itemRequestRepository.save(itemRequest);
+        savedRequest.setItems(itemRepository.findAllByRequestId(savedRequest.getId()));
+        return ItemRequestMapper.toItemRequestDto(savedRequest);
     }
 
     @Override
-    public ItemRequestDto getById(long id, long userId) throws Exception {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        ItemRequest itemRequest = itemRequestRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Item not found"));
-        if (!Objects.equals(itemRequest.getRequestor().getId(), user.getId())) {
-            throw new ValidationException("Validation error");
+    public ItemRequestDto getById(Long userId, Long id) throws Exception {
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        ItemRequest itemRequest = itemRequestRepository.findById(id).orElseThrow(() -> new ItemRequestNotFoundException("Item request not found"));
+        List<Item>  items = itemRepository.findAllByRequestId(itemRequest.getId());
+        itemRequest.setItems(items);
+        return ItemRequestMapper.toItemRequestDto(itemRequest);
+    }
+
+    @Override
+    public List<ItemRequestDto> getAllOwnRequests(Long userId) throws UserNotFoundException {
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(userId);
+        List<Item>        itemsByRequestIds = itemRepository.findAllByRequestIdIn(itemRequests.stream().map(ItemRequest::getId).collect(Collectors.toList()));
+        Map<Long, List<Item>> mappedItemsByRequestIds = itemsByRequestIds.stream().collect(Collectors.groupingBy(item -> item.getRequest().getId()));
+        itemRequests.forEach(itemRequest -> {
+            List<Item> items = mappedItemsByRequestIds.get(itemRequest.getId());
+            itemRequest.setItems(items == null ? new ArrayList<>() : items);
+        });
+        return itemRequests.stream().map(ItemRequestMapper::toItemRequestDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemRequestDto> getAllUserRequests(Long userId, Integer from, Integer size) throws UserNotFoundException, ValidationException {
+        userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        if(size != null && size == 0){
+            throw new ValidationException("Error");
         }
-        List<Item> items = itemRepository.findAllByRequestId(itemRequest.getId());
-        return null;
-    }
+        if (size != null && from != null) {
+            int page = from / size;
 
-    @Override
-    public List<ItemRequestDto> getAll(Long userId, Long from, Long size) throws UserNotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequestorIdOrderByCreatedDesc(userId);
-        return null;
+            PageRequest pageRequest = PageRequest.of(page, size, Sort.by("created").descending());
+
+            List<ItemRequest>     itemRequests            = itemRequestRepository.findAllByRequesterIdNotOrderByCreatedDesc(userId, pageRequest).getContent();
+            List<Item>            itemsByRequestIds       = itemRepository.findAllByRequestIdIn(itemRequests.stream().map(ItemRequest::getId).collect(Collectors.toList()));
+            Map<Long, List<Item>> mappedItemsByRequestIds = itemsByRequestIds.stream().collect(Collectors.groupingBy(item -> item.getRequest().getId()));
+            itemRequests.forEach(itemRequest -> {
+                List<Item> items = mappedItemsByRequestIds.get(itemRequest.getId());
+                itemRequest.setItems(items == null ? new ArrayList<>() : items);
+            });
+            return itemRequests.stream().map(ItemRequestMapper::toItemRequestDto).collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     private void validate(ItemRequestDto itemRequestDto) throws ValidationException {

@@ -29,7 +29,7 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(applicationError, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({ItemNotFoundException.class, UserNotFoundException.class, BookingNotFoundException.class})
+    @ExceptionHandler({ItemNotFoundException.class, UserNotFoundException.class, BookingNotFoundException.class, ItemRequestNotFoundException.class})
     public ResponseEntity<ApplicationError> handleNotFoundException(Exception e) {
         ApplicationError applicationError = new ApplicationError(HttpStatus.NOT_FOUND, "Объект не найден", e);
         log.error("Not found exception thrown");

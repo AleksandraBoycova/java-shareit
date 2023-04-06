@@ -6,27 +6,25 @@ import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import java.time.LocalDate;
-import java.util.Set;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Data
 @Entity
 @Table(name = "item_requests")
 public class ItemRequest {
-    private Long id;
-    private String description;
-    private User requestor;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long          id;
+    private String        description;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "requester_id")
+    private User          requester;
     @CreationTimestamp
-    private LocalDate created;
-
-    @OneToMany (mappedBy = "request", cascade = CascadeType.ALL)
+    private LocalDateTime created;
     @JsonManagedReference
-    private Set<Item> items;
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
+    private List<Item>    items;
+
 }

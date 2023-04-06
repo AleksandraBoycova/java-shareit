@@ -25,10 +25,11 @@ public class Item {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
     @ManyToOne
-    @JoinColumn("request_id")
+    @JoinColumn(name = "request_id")
     @JsonBackReference
     private ItemRequest request;
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+
     @JsonManagedReference
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<Comment> comments;
 }

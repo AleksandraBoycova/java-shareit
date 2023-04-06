@@ -13,6 +13,7 @@ public class ItemMapper {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.isAvailable());
+        itemDto.setRequestId(item.getRequest() == null ? null : item.getRequest().getId());
         if (item.getComments() != null) {
             itemDto.setComments(item.getComments().stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()));
         }
@@ -34,6 +35,7 @@ public class ItemMapper {
         ItemDtoShort itemDtoShort = new ItemDtoShort();
         itemDtoShort.setId(item.getId());
         itemDtoShort.setName(item.getName());
+        itemDtoShort.setOwner(itemDtoShort.getOwner());
         return itemDtoShort;
     }
 }
