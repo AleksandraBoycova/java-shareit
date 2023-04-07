@@ -15,11 +15,11 @@ import java.time.format.DateTimeFormatter;
 
 public class BaseTest {
 
-    protected final String            xShareUserId = "X-Sharer-User-Id";
-    protected final DateTimeFormatter formatter    = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    protected final String xShareUserId = "X-Sharer-User-Id";
+    protected final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
-    protected UserDto buildUserDto(Long id, String email, String name){
+    protected UserDto buildUserDto(Long id, String email, String name) {
         UserDto userDto = new UserDto();
         userDto.setId(id);
         userDto.setEmail(email);
@@ -27,7 +27,7 @@ public class BaseTest {
         return userDto;
     }
 
-    protected static ItemDto buildItemDto(Long id, String name, String description, Boolean available){
+    protected static ItemDto buildItemDto(Long id, String name, String description, Boolean available) {
         ItemDto itemDto = new ItemDto();
         itemDto.setId(id);
         itemDto.setName(name);
@@ -36,7 +36,7 @@ public class BaseTest {
         return itemDto;
     }
 
-    protected Item buildItem(Long id, String name, String description, boolean available, User owner){
+    protected Item buildItem(Long id, String name, String description, boolean available, User owner) {
         Item item = new Item();
         item.setId(id);
         item.setName(name);
@@ -46,7 +46,7 @@ public class BaseTest {
         return item;
     }
 
-    protected static BookingDto buildBookingDto(Long id, Long itemId, Long bookerId, LocalDateTime start, LocalDateTime end, BookingState status){
+    protected static BookingDto buildBookingDto(Long id, Long itemId, Long bookerId, LocalDateTime start, LocalDateTime end, BookingState status) {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setId(id);
         bookingDto.setItemId(itemId);
@@ -57,7 +57,7 @@ public class BaseTest {
         return bookingDto;
     }
 
-    protected static Booking buildBooking(Long id, Item item, User booker, LocalDateTime start, LocalDateTime end, BookingState status){
+    protected static Booking buildBooking(Long id, Item item, User booker, LocalDateTime start, LocalDateTime end, BookingState status) {
         Booking booking = new Booking();
         booking.setId(id);
         booking.setItem(item);
@@ -81,7 +81,7 @@ public class BaseTest {
         return LocalDateTime.parse(dateString, formatter);
     }
 
-    protected CommentDto buildCommentDto(Long id, String text, LocalDateTime created, String name){
+    protected CommentDto buildCommentDto(Long id, String text, LocalDateTime created, String name) {
         CommentDto commentDto = new CommentDto();
         commentDto.setId(id);
         commentDto.setText(text);
@@ -90,7 +90,7 @@ public class BaseTest {
         return commentDto;
     }
 
-    protected ItemRequestDto buildItemRequestDto(Long id, Long requester, String description){
+    protected ItemRequestDto buildItemRequestDto(Long id, Long requester, String description) {
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         itemRequestDto.setId(id);
         itemRequestDto.setRequester(requester);
