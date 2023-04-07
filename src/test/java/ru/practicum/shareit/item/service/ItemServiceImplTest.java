@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import ru.practicum.shareit.BaseTest;
 import ru.practicum.shareit.booking.BookingState;
@@ -41,9 +40,9 @@ class ItemServiceImplTest extends BaseTest {
     @MockBean
     UserRepository userRepository;
     @MockBean
-    private BookingRepository     bookingRepository;
+    private BookingRepository bookingRepository;
     @MockBean
-    private CommentRepository     commentRepository;
+    private CommentRepository commentRepository;
     @MockBean
     private ItemRequestRepository itemRequestRepository;
 
@@ -58,11 +57,11 @@ class ItemServiceImplTest extends BaseTest {
         User user1 = buildUser(2L, "email", "name");
         User user2 = buildUser(3L, "email", "name");
         User user3 = buildUser(4L, "email", "name");
-        Item e1    = buildItem(2L, "item", "description", true, user1);
-        Item e2    = buildItem(3L, "item", "description", true, user1);
-        Item e3    = buildItem(4L, "item", "description", true, user1);
-        Item e4    = buildItem(5L, "item", "description", true, user1);
-        Item e5    = buildItem(6L, "item", "description", true, user1);
+        Item e1 = buildItem(2L, "item", "description", true, user1);
+        Item e2 = buildItem(3L, "item", "description", true, user1);
+        Item e3 = buildItem(4L, "item", "description", true, user1);
+        Item e4 = buildItem(5L, "item", "description", true, user1);
+        Item e5 = buildItem(6L, "item", "description", true, user1);
         when(repository.findAllByOwnerId(anyLong(), any())).thenReturn(new PageImpl<>(List.of(e1, e2, e3, e4, e5)));
         when(bookingRepository.findAllByItemIdInAndStatusAndEndBeforeOrStartBeforeAndEndAfter(anyList(), any(), any(), any(), any())).thenReturn(List.of(
                 buildBooking(4L, e1, user2, getDateFromString("2023-04-02 12:00:00"), getDateFromString("2023-04-03 12:00:00"), BookingState.APPROVED),
@@ -101,8 +100,8 @@ class ItemServiceImplTest extends BaseTest {
         LocalDateTime now = LocalDateTime.now();
         User user1 = buildUser(2L, "email", "name");
         User user2 = buildUser(3L, "email", "name");
-        Item e1    = buildItem(2L, "item", "description", true, user1);
-        Item e2    = buildItem(3L, "item", "description", true, user1);
+        Item e1 = buildItem(2L, "item", "description", true, user1);
+        Item e2 = buildItem(3L, "item", "description", true, user1);
 
         when(repository.findAllByOwnerId(anyLong(), any())).thenReturn(new PageImpl<>(List.of(e1, e2)));
         when(bookingRepository.findAllByItemIdInAndStatusAndEndBeforeOrStartBeforeAndEndAfter(anyList(), any(), any(), any(), any())).thenReturn(List.of(

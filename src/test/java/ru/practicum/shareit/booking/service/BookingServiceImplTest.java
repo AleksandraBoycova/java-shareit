@@ -39,9 +39,9 @@ class BookingServiceImplTest extends BaseTest {
     @Autowired
     private BookingServiceImpl service;
     @MockBean
-    private UserRepository     userRepository;
+    private UserRepository userRepository;
     @MockBean
-    private ItemRepository     itemRepository;
+    private ItemRepository itemRepository;
     @MockBean
     BookingRepository bookingRepository;
 
@@ -49,9 +49,9 @@ class BookingServiceImplTest extends BaseTest {
 
     @Test
     void create() throws Exception {
-        User owner  = buildUser(4L, "mail@mail.com", "user");
+        User owner = buildUser(4L, "mail@mail.com", "user");
         User booker = buildUser(7L, "mail@mail.com", "user");
-        Item item   = buildItem(2L, "item", "description", true, owner);
+        Item item = buildItem(2L, "item", "description", true, owner);
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(booker));
         when(bookingRepository.save(any())).thenReturn(buildBooking(5L, item, booker, NOW.plusDays(3), NOW.plusDays(4), WAITING));
@@ -102,7 +102,7 @@ class BookingServiceImplTest extends BaseTest {
 
     @Test
     void createItemNotAvailableException() {
-        User owner  = buildUser(4L, "mail@mail.com", "user");
+        User owner = buildUser(4L, "mail@mail.com", "user");
         User booker = buildUser(7L, "mail@mail.com", "user");
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(buildItem(2L, "item", "description", false, owner)));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(booker));
@@ -121,7 +121,7 @@ class BookingServiceImplTest extends BaseTest {
     @Test
     void updateItemNotFoundException() {
         User owner = buildUser(4L, "mail@mail.com", "user");
-        Item item  = buildItem(2L, "item", "description", true, owner);
+        Item item = buildItem(2L, "item", "description", true, owner);
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(buildBooking(5L, item, owner, NOW, NOW, WAITING)));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -145,8 +145,8 @@ class BookingServiceImplTest extends BaseTest {
 
     @Test
     void updateValidationException() {
-        User    owner   = buildUser(4L, "mail@mail.com", "user");
-        Item    item    = buildItem(2L, "item", "description", true, owner);
+        User owner = buildUser(4L, "mail@mail.com", "user");
+        Item item = buildItem(2L, "item", "description", true, owner);
         Booking booking = buildBooking(5L, item, owner, NOW, NOW, WAITING);
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
@@ -157,9 +157,9 @@ class BookingServiceImplTest extends BaseTest {
 
     @Test
     void updateBookerEqualsOwner() {
-        User owner  = buildUser(4L, "mail@mail.com", "user");
+        User owner = buildUser(4L, "mail@mail.com", "user");
         User booker = buildUser(3L, "mail3@mail.com", "user");
-        Item item   = buildItem(2L, "item", "description", true, owner);
+        Item item = buildItem(2L, "item", "description", true, owner);
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(buildBooking(5L, item, owner, NOW, NOW, WAITING)));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(booker));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
@@ -169,9 +169,9 @@ class BookingServiceImplTest extends BaseTest {
 
     @Test
     void updateApproveForApproved() {
-        User owner  = buildUser(4L, "mail@mail.com", "user");
+        User owner = buildUser(4L, "mail@mail.com", "user");
         User booker = buildUser(3L, "mail3@mail.com", "user");
-        Item item   = buildItem(2L, "item", "description", true, owner);
+        Item item = buildItem(2L, "item", "description", true, owner);
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(buildBooking(5L, item, owner, NOW, NOW, APPROVED)));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(booker));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
@@ -181,9 +181,9 @@ class BookingServiceImplTest extends BaseTest {
 
     @Test
     void updateUnauthorized() {
-        User owner  = buildUser(4L, "mail@mail.com", "user");
+        User owner = buildUser(4L, "mail@mail.com", "user");
         User booker = buildUser(3L, "mail3@mail.com", "user");
-        Item item   = buildItem(2L, "item", "description", true, owner);
+        Item item = buildItem(2L, "item", "description", true, owner);
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(buildBooking(5L, item, owner, NOW, NOW, WAITING)));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(booker));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
@@ -196,7 +196,7 @@ class BookingServiceImplTest extends BaseTest {
     @Test
     void updateApprovedNull() throws Exception {
         User owner = buildUser(4L, "mail@mail.com", "user");
-        Item item  = buildItem(2L, "item", "description", true, owner);
+        Item item = buildItem(2L, "item", "description", true, owner);
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(buildBooking(5L, item, owner, NOW, NOW, WAITING)));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
@@ -217,7 +217,7 @@ class BookingServiceImplTest extends BaseTest {
     @Test
     void update() throws Exception {
         User owner = buildUser(4L, "mail@mail.com", "user");
-        Item item  = buildItem(2L, "item", "description", true, owner);
+        Item item = buildItem(2L, "item", "description", true, owner);
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(buildBooking(5L, item, owner, NOW, NOW, WAITING)));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
@@ -253,9 +253,9 @@ class BookingServiceImplTest extends BaseTest {
 
     @Test
     void getByIdOwnerNotEqualsBooker() {
-        User    owner   = buildUser(4L, "mail@mail.com", "user");
-        User    booker  = buildUser(3L, "mail@mail.com", "user");
-        Item    item    = buildItem(2L, "item", "description", true, owner);
+        User owner = buildUser(4L, "mail@mail.com", "user");
+        User booker = buildUser(3L, "mail@mail.com", "user");
+        Item item = buildItem(2L, "item", "description", true, owner);
         Booking booking = buildBooking(5L, item, owner, NOW.plusDays(3), NOW.plusDays(4), WAITING);
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(booker));
@@ -265,8 +265,8 @@ class BookingServiceImplTest extends BaseTest {
 
     @Test
     void getById() throws Exception {
-        User    owner   = buildUser(4L, "mail@mail.com", "user");
-        Item    item    = buildItem(2L, "item", "description", true, owner);
+        User owner = buildUser(4L, "mail@mail.com", "user");
+        Item item = buildItem(2L, "item", "description", true, owner);
         Booking booking = buildBooking(5L, item, owner, NOW.plusDays(3), NOW.plusDays(4), WAITING);
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(owner));
@@ -407,7 +407,7 @@ class BookingServiceImplTest extends BaseTest {
     @Test
     void getAllUnsupportedStatus() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
-        assertThrows(ValidationException.class, ()-> service.getAll(8L, "DONE", 0, 20), "Unknown state: UNSUPPORTED_STATUS");
+        assertThrows(ValidationException.class, () -> service.getAll(8L, "DONE", 0, 20), "Unknown state: UNSUPPORTED_STATUS");
     }
 
     @Test
@@ -415,7 +415,7 @@ class BookingServiceImplTest extends BaseTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
         when(itemRepository.findAll()).thenReturn(List.of(buildItem(2L, "item", "description", true,
                 buildUser(1L, "mail@mail.com", "user"))));
-        assertThrows(UnauthorizedException.class, ()-> service.getItemsForUser(8L, "ALL", 0, 20));
+        assertThrows(UnauthorizedException.class, () -> service.getItemsForUser(8L, "ALL", 0, 20));
     }
 
     @Test
@@ -424,12 +424,13 @@ class BookingServiceImplTest extends BaseTest {
         assertThrows(UserNotFoundException.class,
                 () -> service.getItemsForUser(8L, "ALL", 0, 20), "User not found");
     }
+
     @Test
     void getItemsForUserUnsupportedStatus() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(new User()));
         when(itemRepository.findAll()).thenReturn(List.of(buildItem(2L, "item", "description", true,
                 buildUser(1L, "mail@mail.com", "user"))));
-        assertThrows(ValidationException.class, ()-> service.getItemsForUser(1L, "DONE", 0, 20), "Unknown state: UNSUPPORTED_STATUS");
+        assertThrows(ValidationException.class, () -> service.getItemsForUser(1L, "DONE", 0, 20), "Unknown state: UNSUPPORTED_STATUS");
     }
 
 

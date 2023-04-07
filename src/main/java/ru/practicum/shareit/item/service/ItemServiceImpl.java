@@ -20,7 +20,6 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -52,7 +51,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(ItemDto itemDto, long userId) throws Exception {
         validate(itemDto);
         User owner = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        Item item  = ItemMapper.toItem(itemDto);
+        Item item = ItemMapper.toItem(itemDto);
         item.setOwner(owner);
         if (itemDto.getRequestId() != null) {
             item.setRequest(itemRequestRepository.findById(itemDto.getRequestId()).orElse(null));
@@ -114,7 +113,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getAll(long userId, Integer from, Integer size) {
         LocalDateTime now = LocalDateTime.now();
-        List<Item> itemsByOwnerId = itemRepository.findAllByOwnerId(userId,PageRequest.of(from / size, size)).getContent();
+        List<Item> itemsByOwnerId = itemRepository.findAllByOwnerId(userId, PageRequest.of(from / size, size)).getContent();
         List<Long> ownerItemIds = itemsByOwnerId.stream().map(Item::getId).collect(toList());
         List<Booking> lastBookingsList = bookingRepository.findAllByItemIdInAndStatusAndEndBeforeOrStartBeforeAndEndAfter(ownerItemIds, BookingState.APPROVED, now, now, now);
         List<Booking> nextBookingList = bookingRepository.findAllByItemIdInAndStatusAndStartAfter(ownerItemIds, BookingState.APPROVED, now);

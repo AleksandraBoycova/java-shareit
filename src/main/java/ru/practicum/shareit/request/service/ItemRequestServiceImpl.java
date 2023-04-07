@@ -16,14 +16,16 @@ import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class ItemRequestServiceImpl implements ItemRequestService {
-    private UserRepository        userRepository;
+    private UserRepository userRepository;
     private ItemRequestRepository itemRequestRepository;
-    private ItemRepository        itemRepository;
+    private ItemRepository itemRepository;
 
     @Autowired
     public ItemRequestServiceImpl(UserRepository userRepository, ItemRequestRepository itemRequestRepository, ItemRepository itemRepository) {
@@ -48,7 +50,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto getById(Long userId, Long id) throws Exception {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         ItemRequest itemRequest = itemRequestRepository.findById(id).orElseThrow(() -> new ItemRequestNotFoundException("Item request not found"));
-        List<Item>  items = itemRepository.findAllByRequestId(itemRequest.getId());
+        List<Item> items = itemRepository.findAllByRequestId(itemRequest.getId());
         itemRequest.setItems(items);
         return ItemRequestMapper.toItemRequestDto(itemRequest);
     }
@@ -57,7 +59,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getAllOwnRequests(Long userId) throws UserNotFoundException {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(userId);
-        List<Item>        itemsByRequestIds = itemRepository.findAllByRequestIdIn(itemRequests.stream().map(ItemRequest::getId).collect(Collectors.toList()));
+        List<Item> itemsByRequestIds = itemRepository.findAllByRequestIdIn(itemRequests.stream().map(ItemRequest::getId).collect(Collectors.toList()));
         Map<Long, List<Item>> mappedItemsByRequestIds = itemsByRequestIds.stream().collect(Collectors.groupingBy(item -> item.getRequest().getId()));
         itemRequests.forEach(itemRequest -> {
             List<Item> items = mappedItemsByRequestIds.get(itemRequest.getId());
@@ -69,7 +71,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestDto> getAllUserRequests(Long userId, Integer from, Integer size) throws UserNotFoundException, ValidationException {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        if(size != null && size == 0){
+        if (size != null && size == 0) {
             throw new ValidationException("Error");
         }
         if (size != null && from != null) {
@@ -77,8 +79,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by("created").descending());
 
-            List<ItemRequest>     itemRequests            = itemRequestRepository.findAllByRequesterIdNotOrderByCreatedDesc(userId, pageRequest).getContent();
-            List<Item>            itemsByRequestIds       = itemRepository.findAllByRequestIdIn(itemRequests.stream().map(ItemRequest::getId).collect(Collectors.toList()));
+            List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdNotOrderByCreatedDesc(userId, pageRequest).getContent();
+            List<Item> itemsByRequestIds = itemRepository.findAllByRequestIdIn(itemRequests.stream().map(ItemRequest::getId).collect(Collectors.toList()));
             Map<Long, List<Item>> mappedItemsByRequestIds = itemsByRequestIds.stream().collect(Collectors.groupingBy(item -> item.getRequest().getId()));
             itemRequests.forEach(itemRequest -> {
                 List<Item> items = mappedItemsByRequestIds.get(itemRequest.getId());

@@ -12,5 +12,6 @@ public interface ItemRequestService {
     ItemRequestDto getById(Long userId, Long id) throws Exception;
 
     List<ItemRequestDto> getAllOwnRequests(Long userId) throws UserNotFoundException;
+
     List<ItemRequestDto> getAllUserRequests(Long userId, Integer from, Integer size) throws UserNotFoundException, ValidationException;
 }
