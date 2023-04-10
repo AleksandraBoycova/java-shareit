@@ -5,8 +5,10 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -33,16 +35,18 @@ public class BaseTest {
         itemDto.setName(name);
         itemDto.setDescription(description);
         itemDto.setAvailable(available);
+        itemDto.setRequestId(3L);
         return itemDto;
     }
 
-    protected Item buildItem(Long id, String name, String description, boolean available, User owner) {
+    protected Item buildItem(Long id, String name, String description, boolean available, User owner, ItemRequest itemRequest) {
         Item item = new Item();
         item.setId(id);
         item.setName(name);
         item.setDescription(description);
         item.setAvailable(available);
         item.setOwner(owner);
+        item.setRequest(itemRequest);
         return item;
     }
 
@@ -90,11 +94,28 @@ public class BaseTest {
         return commentDto;
     }
 
+    protected Comment buildComment(Long id, String text, LocalDateTime created, String name, User user) {
+        Comment comment = new Comment();
+        comment.setId(id);
+        comment.setText(text);
+        comment.setCreated(created);
+        comment.setAuthor(user);
+        return comment;
+    }
+
     protected ItemRequestDto buildItemRequestDto(Long id, Long requester, String description) {
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         itemRequestDto.setId(id);
         itemRequestDto.setRequester(requester);
         itemRequestDto.setDescription(description);
         return itemRequestDto;
+    }
+
+    protected ItemRequest buildItemRequest(Long id, User requester, String description) {
+        ItemRequest itemRequest = new ItemRequest();
+        itemRequest.setId(id);
+        itemRequest.setRequester(requester);
+        itemRequest.setDescription(description);
+        return itemRequest;
     }
 }
