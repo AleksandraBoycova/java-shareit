@@ -2,7 +2,10 @@ package ru.practicum.shareit.item.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -60,7 +63,7 @@ class ItemServiceImplTest extends BaseTest {
     }
 
     @Test
-    void createUserNotFound(){
+    void createUserNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> service.create(buildItemDto(1L, "name", "abcde", true), 2L));
     }
@@ -78,24 +81,24 @@ class ItemServiceImplTest extends BaseTest {
     }
 
     @Test
-    void updateUserNotFound(){
+    void updateUserNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> service.update(3L, buildItemDto(1L, "name", "abcde", true), 2L));
     }
 
     @Test
-    void updateItemNotFound(){
+    void updateItemNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(buildUser(2L, "email@mail.com", "name")));
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(ItemNotFoundException.class, () -> service.update(3L, buildItemDto(1L, "name", "abcde", true), 2L));
     }
 
     @Test
-    void updateUnauthorized(){
+    void updateUnauthorized() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(buildUser(2L, "email@mail.com", "name")));
         when(repository.findById(anyLong())).thenReturn(
                 Optional.of(buildItem(2L, "item", "description", true,
-                                      buildUser(2L, "email@mail.com", "name"), null)));
+                        buildUser(2L, "email@mail.com", "name"), null)));
         assertThrows(UnauthorizedException.class, () -> service.update(3L, buildItemDto(1L, "name", "abcde", true), 6L));
     }
 
@@ -105,7 +108,7 @@ class ItemServiceImplTest extends BaseTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(repository.findById(anyLong())).thenReturn(
                 Optional.of(buildItem(2L, "item", "description", true,
-                                      buildUser(2L, "email@mail.com", "name"), null)));
+                        buildUser(2L, "email@mail.com", "name"), null)));
         when(repository.save(any())).thenReturn(buildItem(2L, "name", "asdfg", true, user, null));
         ItemDto updated = service.update(3L, buildItemDto(1L, "name", "abcde", true), 2L);
         assertEquals(2L, updated.getId());
@@ -117,9 +120,9 @@ class ItemServiceImplTest extends BaseTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(repository.findById(anyLong())).thenReturn(
                 Optional.of(buildItem(2L, "item", "description", true,
-                                      buildUser(2L, "email@mail.com", "name"), null)));
+                        buildUser(2L, "email@mail.com", "name"), null)));
         doNothing().when(repository).deleteById(anyLong());
-        ItemDto deleted = service.delete(3L,  2L);
+        ItemDto deleted = service.delete(3L, 2L);
         assertEquals(2L, deleted.getId());
     }
 
@@ -128,8 +131,8 @@ class ItemServiceImplTest extends BaseTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(buildUser(2L, "email@mail.com", "name")));
         when(repository.findById(anyLong())).thenReturn(
                 Optional.of(buildItem(2L, "item", "description", true,
-                                      buildUser(2L, "email@mail.com", "name"), null)));
-        assertThrows(UnauthorizedException.class, () -> service.delete(3L,  6L));
+                        buildUser(2L, "email@mail.com", "name"), null)));
+        assertThrows(UnauthorizedException.class, () -> service.delete(3L, 6L));
     }
 
     @Test
@@ -142,7 +145,7 @@ class ItemServiceImplTest extends BaseTest {
     void deleteItemNotfound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(buildUser(2L, "email@mail.com", "name")));
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(ItemNotFoundException.class, () -> service.delete(3L,  2L));
+        assertThrows(ItemNotFoundException.class, () -> service.delete(3L, 2L));
     }
 
     @Test
@@ -150,7 +153,7 @@ class ItemServiceImplTest extends BaseTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         when(repository.findById(anyLong())).thenReturn(
                 Optional.of(buildItem(2L, "item", "description", true,
-                                      buildUser(2L, "email@mail.com", "name"), null)));
+                        buildUser(2L, "email@mail.com", "name"), null)));
         assertThrows(UserNotFoundException.class, () -> service.getById(3L, 2L));
     }
 
@@ -158,7 +161,7 @@ class ItemServiceImplTest extends BaseTest {
     void getByIdItemNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(buildUser(2L, "email@mail.com", "name")));
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(ItemNotFoundException.class, () -> service.getById(3L,  2L));
+        assertThrows(ItemNotFoundException.class, () -> service.getById(3L, 2L));
     }
 
     @Test
@@ -167,11 +170,11 @@ class ItemServiceImplTest extends BaseTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(repository.findById(anyLong())).thenReturn(
                 Optional.of(buildItem(2L, "item", "description", true,
-                                      user, null)));
-        ItemDto itemDto = service.getById(3L,  2L);
+                        user, null)));
+        ItemDto itemDto = service.getById(3L, 2L);
         assertEquals(2L, itemDto.getId());
-        assertNull( itemDto.getNextBooking());
-        assertNull( itemDto.getLastBooking());
+        assertNull(itemDto.getNextBooking());
+        assertNull(itemDto.getLastBooking());
     }
 
     @Test
@@ -183,11 +186,11 @@ class ItemServiceImplTest extends BaseTest {
                 Optional.of(item));
         when(bookingRepository.findAllByItemIdInAndStatusAndStartBeforeOrderByStartDesc(anyList(), any(), any())).thenReturn(List.of(
                 buildBooking(2L, buildItem(1L, "abc", "def", true, user, null),
-                             user, LocalDateTime.now(), LocalDateTime.now(), BookingState.APPROVED)));
+                        user, LocalDateTime.now(), LocalDateTime.now(), BookingState.APPROVED)));
         when(bookingRepository.findAllByItemIdInAndStatusAndStartAfterOrderByStart(anyList(), any(), any())).thenReturn(List.of(
                 buildBooking(8L, buildItem(7L, "abc", "def", true, user, null),
-                             user, LocalDateTime.now(), LocalDateTime.now(), BookingState.APPROVED)
-                                                                                                                               ));
+                        user, LocalDateTime.now(), LocalDateTime.now(), BookingState.APPROVED)
+        ));
         ItemDto itemDto = service.getById(3L, 2L);
         assertNotNull(itemDto.getNextBooking());
         assertNotNull(itemDto.getLastBooking());
@@ -305,7 +308,7 @@ class ItemServiceImplTest extends BaseTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         when(repository.findById(anyLong())).thenReturn(
                 Optional.of(buildItem(2L, "item", "description", true,
-                                      buildUser(2L, "email@mail.com", "name"), null)));
+                        buildUser(2L, "email@mail.com", "name"), null)));
         assertThrows(UserNotFoundException.class, () -> service.addComment(3L, 2L, buildCommentDto(1L, "abc", LocalDateTime.now(), "name")));
     }
 
@@ -313,7 +316,7 @@ class ItemServiceImplTest extends BaseTest {
     void addCommentItemNotFund() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(buildUser(2L, "email@mail.com", "name")));
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
-        assertThrows(ItemNotFoundException.class, () -> service.addComment(3L,  2L, buildCommentDto(1L, "abc", LocalDateTime.now(), "name")));
+        assertThrows(ItemNotFoundException.class, () -> service.addComment(3L, 2L, buildCommentDto(1L, "abc", LocalDateTime.now(), "name")));
     }
 
     @Test
@@ -325,7 +328,7 @@ class ItemServiceImplTest extends BaseTest {
                 Optional.of(item));
         when(bookingRepository.findAllByBookerId(anyLong())).thenReturn(List.of(
                 buildBooking(2L, item, user, LocalDateTime.now().minusDays(3), LocalDateTime.now().plusDays(5), BookingState.APPROVED)
-                                                                                              ));
+        ));
         when(commentRepository.save(any())).thenReturn(buildComment(2L, "text", LocalDateTime.now(), "name", user));
         CommentDto commentDto = service.addComment(2L, 2L, buildCommentDto(1L, "text", LocalDateTime.now(), "name"));
         assertEquals(2L, commentDto.getId());
@@ -340,7 +343,7 @@ class ItemServiceImplTest extends BaseTest {
                 Optional.of(item));
         when(bookingRepository.findAllByBookerId(anyLong())).thenReturn(List.of(
                 buildBooking(2L, item, user, LocalDateTime.now().minusDays(3), LocalDateTime.now().plusDays(5), BookingState.WAITING)
-                                                                               ));
+        ));
         assertThrows(ValidationException.class, () -> service.addComment(2L, 2L, buildCommentDto(1L, "text", LocalDateTime.now(), "nmae")));
     }
 

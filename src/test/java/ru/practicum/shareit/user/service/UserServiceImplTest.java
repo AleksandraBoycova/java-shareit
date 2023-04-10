@@ -53,7 +53,7 @@ class UserServiceImplTest extends BaseTest {
     void updateUserNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class,
-                     () -> service.update(2L, buildUserDto(2L, "email@mail.com", "name")), "User not found");
+                () -> service.update(2L, buildUserDto(2L, "email@mail.com", "name")), "User not found");
     }
 
     @Test
@@ -70,7 +70,7 @@ class UserServiceImplTest extends BaseTest {
     void deleteWithError() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class,
-                     () -> service.delete(2L), "User not found");
+                () -> service.delete(2L), "User not found");
     }
 
     @Test
@@ -87,7 +87,7 @@ class UserServiceImplTest extends BaseTest {
     void getByIdWithError() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class,
-                     () -> service.getById(2L), "User not found");
+                () -> service.getById(2L), "User not found");
     }
 
     @Test
@@ -104,18 +104,18 @@ class UserServiceImplTest extends BaseTest {
         when(userRepository.findAll()).thenReturn(List.of(
                 buildUser(1L, "email@mail.com", "name"),
                 buildUser(2L, "user@mail.com", "anna")
-                                                         ));
+        ));
         List<UserDto> users = service.getAll();
         assertEquals(2, users.size());
     }
 
-    private static Stream<Arguments> prepareDataForCreate(){
+    private static Stream<Arguments> prepareDataForCreate() {
         return Stream.of(
                 Arguments.of(null, "name", "Email is null!"),
                 Arguments.of("emil@mail.com", "   ", "Name is null or empty"),
                 Arguments.of("emil@mail.com", "", "Name is null or empty"),
                 Arguments.of("emil@mail.com", null, "Name is null or empty")
-                        );
+        );
     }
 
 }

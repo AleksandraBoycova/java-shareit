@@ -18,9 +18,7 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -46,7 +44,7 @@ class ItemRequestServiceImplTest extends BaseTest {
     void createUserNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class,
-                     () -> service.create(buildItemRequestDto(1L, 2L, "123"), 2L), "User not found");
+                () -> service.create(buildItemRequestDto(1L, 2L, "123"), 2L), "User not found");
     }
 
     @ParameterizedTest
@@ -70,7 +68,7 @@ class ItemRequestServiceImplTest extends BaseTest {
     void getByIdUserNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class,
-                     () -> service.getById(3L, 2L), "User not found");
+                () -> service.getById(3L, 2L), "User not found");
     }
 
     @Test
@@ -94,7 +92,7 @@ class ItemRequestServiceImplTest extends BaseTest {
     void getAllOwnRequestsUserNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class,
-                     () -> service.getAllOwnRequests(3L), "User not found");
+                () -> service.getAllOwnRequests(3L), "User not found");
     }
 
     @Test
@@ -109,7 +107,7 @@ class ItemRequestServiceImplTest extends BaseTest {
                 buildItem(5L, "name", "description", true, buildUser(3L, "mail@mail.com", "name"), e1),
                 buildItem(6L, "name", "description", true, buildUser(3L, "mail@mail.com", "name"), e2),
                 buildItem(7L, "name", "description", true, buildUser(3L, "mail@mail.com", "name"), e3)
-                                                                               ));
+        ));
         List<ItemRequestDto> requests = service.getAllOwnRequests(2L);
         assertEquals(3, requests.size());
         assertEquals(2, requests.get(0).getItems().size());
@@ -121,7 +119,7 @@ class ItemRequestServiceImplTest extends BaseTest {
     void getAllUserRequestsUserNotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class,
-                     () -> service.getAllUserRequests(3L, 0,5), "User not found");
+                () -> service.getAllUserRequests(3L, 0, 5), "User not found");
     }
 
     @Test
@@ -136,8 +134,8 @@ class ItemRequestServiceImplTest extends BaseTest {
                 buildItem(5L, "name", "description", true, buildUser(7L, "mail@mail.com", "name"), e1),
                 buildItem(6L, "name", "description", true, buildUser(8L, "mail@mail.com", "name"), e2),
                 buildItem(7L, "name", "description", true, buildUser(9L, "mail@mail.com", "name"), e3)
-                                                                               ));
-        List<ItemRequestDto> requests = service.getAllUserRequests(2L, 0,15);
+        ));
+        List<ItemRequestDto> requests = service.getAllUserRequests(2L, 0, 15);
         assertEquals(3, requests.size());
         assertEquals(2, requests.get(0).getItems().size());
         assertEquals(1, requests.get(1).getItems().size());
@@ -147,22 +145,22 @@ class ItemRequestServiceImplTest extends BaseTest {
     @Test
     void getAllUserRequestsEmpty() throws UserNotFoundException, ValidationException {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(buildUser(2L, "mail@mail.com", "name")));
-        List<ItemRequestDto> requests = service.getAllUserRequests(2L, null,null);
+        List<ItemRequestDto> requests = service.getAllUserRequests(2L, null, null);
         assertTrue(requests.isEmpty());
     }
 
     @Test
     void getAllUserRequestsValidationError() throws UserNotFoundException, ValidationException {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(buildUser(2L, "mail@mail.com", "name")));
-        assertThrows(ValidationException.class, () -> service.getAllUserRequests(2L, 0,0), "Error");
+        assertThrows(ValidationException.class, () -> service.getAllUserRequests(2L, 0, 0), "Error");
     }
 
-    private static Stream<Arguments> prepareDataForCreate(){
+    private static Stream<Arguments> prepareDataForCreate() {
         return Stream.of(
                 Arguments.of(null, "Description is null"),
                 Arguments.of("    ", "Description is null"),
                 Arguments.of("", "Description is null")
-                        );
+        );
     }
 
 }
