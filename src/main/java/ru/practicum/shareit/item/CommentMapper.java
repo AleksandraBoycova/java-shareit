@@ -14,12 +14,4 @@ public class CommentMapper {
         return commentDto;
 
     }
-
-    public static Comment toComment(CommentDto commentDto) {
-        Comment comment = new Comment();
-        comment.setId(commentDto.getId());
-        comment.setText(commentDto.getText());
-        return comment;
-
-    }
 }

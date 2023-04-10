@@ -347,6 +347,25 @@ class ItemServiceImplTest extends BaseTest {
         assertThrows(ValidationException.class, () -> service.addComment(2L, 2L, buildCommentDto(1L, "text", LocalDateTime.now(), "nmae")));
     }
 
+    @Test
+    void getByIdByUser() throws Exception {
+        User user = buildUser(2L, "email@mail.com", "name");
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        Item item = buildItem(5L, "item", "description", true, user, null);
+        when(repository.findById(anyLong())).thenReturn(
+                Optional.of(item));
+        when(bookingRepository.findAllByItemIdInAndStatusAndStartBeforeOrderByStartDesc(anyList(), any(), any())).thenReturn(List.of(
+                buildBooking(2L, buildItem(1L, "abc", "def", true, user, null),
+                        user, LocalDateTime.now(), LocalDateTime.now(), BookingState.APPROVED)));
+        when(bookingRepository.findAllByItemIdInAndStatusAndStartAfterOrderByStart(anyList(), any(), any())).thenReturn(List.of(
+                buildBooking(8L, buildItem(7L, "abc", "def", true, user, null),
+                        user, LocalDateTime.now(), LocalDateTime.now(), BookingState.APPROVED)
+        ));
+        ItemDto itemDto = service.getById(3L, 8L);
+        assertNull(itemDto.getNextBooking());
+        assertNull(itemDto.getLastBooking());
+    }
+
     private static Stream<Arguments> prepareDataForCreate() {
         return Stream.of(
                 Arguments.of(buildItemDto(1L, null, "description", true), "Not valid"),

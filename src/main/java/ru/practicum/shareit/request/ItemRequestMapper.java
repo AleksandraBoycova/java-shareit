@@ -16,12 +16,4 @@ public class ItemRequestMapper {
         itemRequestDto.setItems(itemRequest.getItems() == null ? null : itemRequest.getItems().stream().map(ItemMapper::toItemDto).collect(Collectors.toList()));
         return itemRequestDto;
     }
-
-    public static ItemRequest toItemRequest(ItemRequestDto itemRequestDto) {
-        ItemRequest itemRequest = new ItemRequest();
-        itemRequest.setId(itemRequestDto.getId());
-        itemRequest.setDescription(itemRequestDto.getDescription());
-        itemRequest.setCreated(itemRequestDto.getCreated());
-        return itemRequest;
-    }
 }
