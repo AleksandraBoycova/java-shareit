@@ -33,10 +33,10 @@ create TABLE IF NOT EXISTS bookings
     booking_start TIMESTAMP NOT NULL,
     booking_end TIMESTAMP NOT NULL,
     booking_status VARCHAR(512) NOT NULL,
-    booker_id BIGINT,
+    owner_id BIGINT,
     item_id BIGINT,
     CONSTRAINT pk_booking PRIMARY KEY(id),
-    CONSTRAINT FK_BOOKING_OWNER FOREIGN KEY(booker_id) REFERENCES users(id),
+    CONSTRAINT FK_BOOKING_OWNER FOREIGN KEY(owner_id) REFERENCES users(id),
     CONSTRAINT FK_BOOKING_ITEM FOREIGN KEY(item_id) REFERENCES items (id));
 
 create TABLE IF NOT EXISTS comments
