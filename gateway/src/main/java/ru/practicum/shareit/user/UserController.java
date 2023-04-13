@@ -24,26 +24,26 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestBody @Valid UserDto userDto) throws Exception {
-        return UserClient.create(userDto);
+        return userClient.create(userDto);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Object> update(@PathVariable long id, @RequestBody @Valid UserDto userDto) throws Exception {
-        return UserClient.update(id, userDto);
+        return userClient.update(id, userDto);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable long id) throws Exception {
-        return UserClient.delete(id);
+        return userClient.delete(id);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getById(@PathVariable long id) throws Exception {
-        return UserClient.getById(id);
+        return userClient.getById(id);
     }
 
     @GetMapping
     public ResponseEntity<Object> getAll() {
-        return UserClient.getAll();
+        return userClient.getAll();
     }
 }

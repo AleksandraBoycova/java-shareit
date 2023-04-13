@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -19,12 +18,12 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@RequestBody @Valid UserDto userDto) throws Exception {
+    public UserDto create(@RequestBody UserDto userDto) throws Exception {
         return service.create(userDto);
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@PathVariable long id, @RequestBody @Valid UserDto userDto) throws Exception {
+    public UserDto update(@PathVariable long id, @RequestBody UserDto userDto) throws Exception {
         return service.update(id, userDto);
     }
 

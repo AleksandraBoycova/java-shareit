@@ -24,7 +24,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(UserDto userDto) throws Exception {
-        validateUser(userDto);
         User user = new User();
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
@@ -63,12 +62,4 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
-    private void validateUser(UserDto userDto) throws ValidationException, DuplicateValueException {
-        if (userDto.getEmail() == null) {
-            throw new ValidationException("Email is null!");
-        }
-        if (userDto.getName() == null || userDto.getName().isBlank()) {
-            throw new ValidationException("Name is null or empty");
-        }
-    }
 }

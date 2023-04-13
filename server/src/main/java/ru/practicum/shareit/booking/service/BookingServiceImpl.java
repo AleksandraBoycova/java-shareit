@@ -35,7 +35,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto create(BookingDto bookingDto, long userId) throws Exception {
-        checkBookingDates(bookingDto);
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setStatus(BookingState.WAITING);
         User booker = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -155,17 +154,5 @@ public class BookingServiceImpl implements BookingService {
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
 
-    }
-
-    private void checkBookingDates(BookingDto bookingDto) throws ValidationException {
-        if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
-            throw new ValidationException("Start or End is null");
-        }
-        LocalDateTime now = LocalDateTime.now();
-        if (bookingDto.getStart().isBefore(now) || bookingDto.getEnd().isBefore(now)
-                || bookingDto.getStart().equals(bookingDto.getEnd())
-                || bookingDto.getStart().isAfter(bookingDto.getEnd())) {
-            throw new ValidationException("Start or End is wrong");
-        }
     }
 }

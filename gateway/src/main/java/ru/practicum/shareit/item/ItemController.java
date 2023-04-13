@@ -11,6 +11,7 @@ import ru.practicum.shareit.booking.BookingClient;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -26,13 +27,13 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                 @RequestBody ItemRequestDto itemDto) throws Exception {
+                                 @RequestBody @Valid ItemRequestDto itemDto) throws Exception {
         return itemClient.create(itemDto, userId);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Object> update(@RequestHeader("X-Sharer-User-Id") long userId,
-                          @RequestBody ItemRequestDto itemDto, @PathVariable long id) throws Exception {
+                          @RequestBody @Valid ItemRequestDto itemDto, @PathVariable long id) throws Exception {
         return itemClient.update(id, itemDto, userId);
     }
 
@@ -64,7 +65,7 @@ public class ItemController {
 
     @PostMapping("{itemId}/comment")
     public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId,
-                                 @RequestBody CommentRequestDto commentDto) throws Exception {
+                                 @RequestBody@Valid CommentRequestDto commentDto) throws Exception {
         return itemClient.addComment(userId, itemId, commentDto);
     }
 }

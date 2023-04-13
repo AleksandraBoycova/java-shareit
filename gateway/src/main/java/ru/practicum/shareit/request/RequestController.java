@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.ItemClient;
 import ru.practicum.shareit.request.dto.RequestClient;
 import ru.practicum.shareit.request.dto.RequestDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
@@ -25,26 +26,26 @@ import java.util.List;
         private final RequestClient requestClient;
 
         @PostMapping
-        public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody RequestDto itemRequestDto) throws Exception {
-            return RequestClient.create(itemRequestDto, userId);
+        public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid RequestDto itemRequestDto) throws Exception {
+            return requestClient.create(itemRequestDto, userId);
         }
 
         @GetMapping
         public ResponseEntity<Object> getItemRequests(@RequestHeader("X-Sharer-User-Id") Long userId) throws Exception {
-            return RequestClient.getAllOwnRequests(userId);
+            return requestClient.getAllOwnRequests(userId);
         }
 
         @GetMapping("/all")
         public ResponseEntity<Object> getAllItemRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                        @PositiveOrZero @RequestParam(value = "from", required = false) Integer from,
                                                        @RequestParam(value = "size", required = false) Integer size) throws Exception {
-            return RequestClient.getAllUserRequests(userId, from, size);
+            return requestClient.getAllUserRequests(userId, from, size);
         }
 
         @GetMapping("/{requestId}")
         public ResponseEntity<Object> getItemRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @PathVariable Long requestId) throws Exception {
-            return RequestClient.getById(userId, requestId);
+            return requestClient.getById(userId, requestId);
         }
     }
 }
