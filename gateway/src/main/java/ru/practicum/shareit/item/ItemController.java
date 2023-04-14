@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.BookingClient;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.ItemRequestUpdateDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -33,7 +34,7 @@ public class ItemController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Object> update(@RequestHeader("X-Sharer-User-Id") long userId,
-                          @RequestBody @Valid ItemRequestDto itemDto, @PathVariable long id) throws Exception {
+                                         @RequestBody @Valid ItemRequestUpdateDto itemDto, @PathVariable long id) throws Exception {
         return itemClient.update(id, itemDto, userId);
     }
 

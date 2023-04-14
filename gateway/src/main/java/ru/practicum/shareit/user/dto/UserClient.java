@@ -33,7 +33,7 @@ public class UserClient extends BaseClient {
         return post("", userDto);
     }
 
-    public ResponseEntity<Object> update(long id, UserDto userDto) {
+    public ResponseEntity<Object> update(long id, UserUpdateDto userDto) {
         return patch("/" + id, userDto);
 
     }
@@ -41,5 +41,10 @@ public class UserClient extends BaseClient {
     public ResponseEntity<Object> getById(long id) {
         return get("/" + id);
 
+    }
+
+    public ResponseEntity<Object> delete(long id) {
+
+        return delete("/" + id);
     }
 }

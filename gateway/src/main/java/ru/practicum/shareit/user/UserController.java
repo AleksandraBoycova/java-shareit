@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.RequestClient;
 import ru.practicum.shareit.user.dto.UserClient;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserUpdateDto;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Object> update(@PathVariable long id, @RequestBody @Valid UserDto userDto) throws Exception {
+    public ResponseEntity<Object> update(@PathVariable long id, @RequestBody @Valid UserUpdateDto userDto) throws Exception {
         return userClient.update(id, userDto);
     }
 
