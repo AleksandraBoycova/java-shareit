@@ -36,11 +36,12 @@ public class RequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getAllUserRequests(Long userId, Integer from, Integer size) {
-        Map<String, Object> parameters = Map.of(
-                "from", from,
-                "size", size
-        );
-        return get("/all?from={from}&size={size}", userId, parameters);
+        if (from == null && size == null) {
+            return get("/all", userId);
+        } else {
+            Map<String, Object> parameters = Map.of("from", from, "size", size);
+            return get("/all?from={from}&size={size}", userId, parameters);
+        }
 
     }
 

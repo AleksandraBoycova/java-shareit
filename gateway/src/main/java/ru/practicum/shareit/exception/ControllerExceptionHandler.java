@@ -71,4 +71,11 @@ public class ControllerExceptionHandler {
         log.error("Duplicate Value exception thrown");
         return new ResponseEntity<>(applicationError, HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApplicationError> handleIllegalArgumentException(IllegalArgumentException e) {
+        ApplicationError applicationError = new ApplicationError(HttpStatus.BAD_REQUEST, e);
+        applicationError.setError(e.getMessage());
+        log.error("IllegalArgumentException Thrown");
+        return new ResponseEntity<>(applicationError, HttpStatus.BAD_REQUEST);
+    }
 }
