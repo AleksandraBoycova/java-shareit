@@ -130,7 +130,7 @@ public class ItemServiceImpl implements ItemService {
             itemDto.setNextBooking(next.get(item.getId()) == null ? null : BookingMapper.toBookingDto(next.get(item.getId()).get(0)));
             itemDtos.add(itemDto);
         });
-        return itemDtos;
+        return itemDtos.stream().sorted(Comparator.comparing(ItemDto::getId)).collect(Collectors.toList());
     }
 
     @Override
