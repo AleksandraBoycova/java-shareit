@@ -50,7 +50,7 @@ public class BookingClient extends BaseClient {
             return patch("/" + bookingId, userId, bookingDto);
         } else {
             Map<String, Object> parameters = Map.of("approved", approved);
-            return put("/" + bookingId, userId, parameters, bookingDto);
+            return patch("/" + bookingId, userId, parameters, bookingDto);
         }
     }
 
@@ -62,4 +62,6 @@ public class BookingClient extends BaseClient {
         );
         return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
     }
+
+
 }
