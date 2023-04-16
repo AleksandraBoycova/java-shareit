@@ -64,6 +64,7 @@ public class BookingController {
                                                 @Min(1) @RequestParam(value = "size", defaultValue = "20") Integer size) throws Exception {
         return bookingClient.getItemsForUser(userId, state, from, size);
     }
+
     private void checkBookingDates(BookItemRequestDto bookingDto) throws ValidationException {
 
         if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {

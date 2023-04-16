@@ -44,15 +44,15 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApplicationError> methodArgumentNotValidException(MethodArgumentNotValidException e) {
-        StringBuilder    errorMessage = new StringBuilder();
-        List<FieldError> allErrors    = e.getBindingResult().getFieldErrors();
+        StringBuilder errorMessage = new StringBuilder();
+        List<FieldError> allErrors = e.getBindingResult().getFieldErrors();
         for (FieldError error : allErrors) {
             errorMessage.append("Field: ").append(error.getField());
             errorMessage.append(", rejected value: ").append(error.getRejectedValue());
             errorMessage.append(" error: ").append(error.getDefaultMessage());
         }
         ApplicationError applicationError = new ApplicationError(HttpStatus.BAD_REQUEST, "Ошибка валидации. " + errorMessage, e);
-        MethodParameter  parameter        = e.getParameter();
+        MethodParameter parameter = e.getParameter();
         parameter.getAnnotatedElement();
         log.error("Method Argument Not Valid Exception");
         return new ResponseEntity<>(applicationError, HttpStatus.BAD_REQUEST);
@@ -71,6 +71,7 @@ public class ControllerExceptionHandler {
         log.error("Duplicate Value exception thrown");
         return new ResponseEntity<>(applicationError, HttpStatus.CONFLICT);
     }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApplicationError> handleIllegalArgumentException(IllegalArgumentException e) {
         ApplicationError applicationError = new ApplicationError(HttpStatus.BAD_REQUEST, e);
