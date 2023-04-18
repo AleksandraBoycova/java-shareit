@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
@@ -10,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
-@Validated
 public class BookingController {
 
     private BookingService bookingService;
@@ -49,7 +47,7 @@ public class BookingController {
     public List<BookingDto> getItemsByAll(@RequestHeader("X-Sharer-User-Id") long userId,
                                           @RequestParam(name = "state", required = false, defaultValue = "ALL") String state,
                                           @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                          @RequestParam(value  = "size", defaultValue = "20") Integer size) throws Exception {
+                                          @RequestParam(value = "size", defaultValue = "20") Integer size) throws Exception {
         return bookingService.getItemsForUser(userId, state, from, size);
     }
 
